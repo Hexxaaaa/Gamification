@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Page</title>
   <link href="{{ asset('css/login.css') }}" rel="stylesheet">
-
+<img src="{{ url('galery/logo.jpg') }}" />
 </head>
 <body>
   <div class="container">

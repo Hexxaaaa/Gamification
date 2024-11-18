@@ -44,8 +44,8 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 // Handle Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::get('/auth/{provider}', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
-Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
+Route::get('/login/{provider}', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
+Route::get('/login/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
 // ===========================
 //        Protected Routes
 // ===========================

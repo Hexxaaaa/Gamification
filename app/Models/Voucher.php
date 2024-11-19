@@ -5,26 +5,53 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Voucher extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
-        'user_id','code', 'points_required', 'description', 'status',
+        'user_id',
+        'code',
+        'points_required',
+        'description',
+        'status',
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['code', 'points_required', 'description', 'status'])
-            ->useLogName('voucher')
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
+    /**
+     * Attributes that should be logged.
+     *
+     * @var array
+     */
+    protected static $logAttributes = [
+        'code',
+        'points_required',
+        'description',
+        'status',
+    ];
 
-    // Relasi dengan UserVoucher
+    /**
+     * Only log the changed attributes.
+     *
+     * @var bool
+     */
+    protected static $logOnlyDirty = true;
+
+    /**
+     * Name of the log.
+     *
+     * @var string
+     */
+    protected static $logName = 'voucher';
+
+    /**
+     * Prevent logging if no attributes have changed.
+     *
+     * @var bool
+     */
+    public static $submitEmptyLogs = false;
+
+    // Relationships
     public function userVouchers()
     {
         return $this->hasMany(UserVoucher::class);

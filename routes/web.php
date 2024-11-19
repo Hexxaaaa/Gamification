@@ -22,11 +22,8 @@ use App\Http\Controllers\AuthController;
     //        Home Route
     // ===========================
     Route::get('/', function () {
-        return view('auth.index');
+        return view('home');
     })->name('home');
-    Route::get('/dashboard', function () {
-        return view('auth.dashboard');
-    })->name('dashboard');
 
 // ===========================
 //        Authentication Routes
@@ -49,7 +46,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/login/{provider}', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
-Route::get('/login/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
+Route::get('login/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
 // ===========================
 //        Protected Routes
 // ===========================
@@ -60,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     // User Routes
     Route::prefix('user')->name('user.')->group(function () {
         // Dashboard
-        Route::get('/dashboard', [UserController::class, 'auth.dashboard'])->name('auth.dashboard');
+        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
         // Task Management
         Route::post('/tasks/{taskId}/start', [UserController::class, 'startTask'])->name('tasks.start');

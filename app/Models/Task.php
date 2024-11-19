@@ -5,29 +5,59 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+
 class Task extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'description',
         'points',
         'status',
         'deadline',
-        'video_url', // New field for video link
+        'video_type',
+        'video_url',
+        'thumbnail_url',
+        'featured',
     ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['description', 'points', 'status', 'deadline', 'video_url'])
-            ->useLogName('task')
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
+    /**
+     * Attributes that should be logged.
+     *
+     * @var array
+     */
+    protected static $logAttributes = [
+        'description',
+        'points',
+        'status',
+        'deadline',
+        'video_url',
+        'thumbnail_url',
+        'featured',
+    ];
 
-    // Relasi dengan UserTask
+    /**
+     * Only log the changed attributes.
+     *
+     * @var bool
+     */
+    protected static $logOnlyDirty = true;
+
+    /**
+     * Name of the log.
+     *
+     * @var string
+     */
+    protected static $logName = 'task';
+
+    /**
+     * Prevent logging if no attributes have changed.
+     *
+     * @var bool
+     */
+    public static $submitEmptyLogs = false;
+
+    // Relationship with UserTask
     public function userTasks()
     {
         return $this->hasMany(UserTask::class);

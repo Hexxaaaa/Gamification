@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Interaction extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'user_id',
@@ -18,13 +17,45 @@ class Interaction extends Model
         'content', // New field for comments
     ];
 
-    public function getActivitylogOptions(): LogOptions
+    /**
+     * Attributes that should be logged.
+     *
+     * @var array
+     */
+    protected static $logAttributes = [
+        'type',
+        'content',
+    ];
+
+    /**
+     * Only log the changed attributes.
+     *
+     * @var bool
+     */
+    protected static $logOnlyDirty = true;
+
+    /**
+     * Name of the log.
+     *
+     * @var string
+     */
+    protected static $logName = 'interaction';
+
+    /**
+     * Prevent logging if no attributes have changed.
+     *
+     * @var bool
+     */
+    public static $submitEmptyLogs = false;
+
+    /**
+     * Determine if the model should be logged.
+     *
+     * @return bool
+     */
+    public function shouldLogActivity(): bool
     {
-        return LogOptions::defaults()
-            ->logOnly(['type', 'content'])
-            ->useLogName('interaction')
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+        return true;
     }
 
     // Relationships

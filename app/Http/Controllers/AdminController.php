@@ -125,6 +125,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'phone_number' => 'nullable|string|max:15',
             'age' => 'nullable|integer',
             'location' => 'nullable|string|max:255',
             'password' => 'required|string|min:8|confirmed',
@@ -135,6 +136,7 @@ class AdminController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone_number' => $request->phone_number,
             'age' => $request->age,
             'location' => $request->location,
             'password' => Hash::make($request->password),
@@ -190,6 +192,7 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone_number' => 'nullable|string|max:15',
             'age' => 'nullable|integer',
             'location' => 'nullable|string|max:255',
             'is_admin' => 'required|boolean',
@@ -198,7 +201,7 @@ class AdminController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $data = $request->only(['name', 'email', 'age', 'location', 'is_admin', 'active']);
+        $data = $request->only(['name', 'email', 'phone_number', 'age', 'location', 'is_admin', 'active']);
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive Login Page</title>
-  <link rel="stylesheet" href="{{ asset('css/login.css')  }}">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 <body>
   <div class="container">
@@ -19,30 +19,35 @@
         <img src="{{ url('gallery/logo.jpg') }}" class="logoatas">
         <p>Login into your account</p>
       </div>
-      <form>
+      <form action="{{ route('login.submit') }}" method="POST">
+        @csrf
         <label for="email">Email Id:</label>
-        <input type="email" id="email" placeholder="test@program.com" required>
+        <input type="email" id="email" name="email" placeholder="test@program.com" required>
         <span class="icon">&#9993;</span>
+
         <label for="password">Password:</label>
-        <input type="password" id="password" placeholder="Enter your password" required>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
         <span class="icon2">&#128274;</span>
+
         <div class="forgot-password">
           <a href="#">Forgot password?</a>
         </div>
 
         <button type="submit" class="btn primary-btn">
-          <a href="/dashboard" class="logins">
-            Login now
-          </a>
+          Login now
         </button>
 
         <div class="or">
           <span>OR</span>
         </div>
 
-        <button type="button" class="btn google-btn">Continue with Google</button>
+       <button class="btn google-btn"> <a href="{{ route('social.redirect', ['provider' => 'google']) }}">
+          Continue with Google
+        </a>
+      </button>
         <button type="button" class="btn signup-btn">
-          <a href="/register" class="registers">Sign up</a></button>
+          <a href="{{ route('register') }}" class="registers">Sign up</a>
+        </button>
       </form>
     </div>
   </div>

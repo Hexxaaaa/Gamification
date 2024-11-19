@@ -38,6 +38,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'age' => 'nullable|integer',
             'location' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:15',
+            
         ]);
 
         // Create a new user instance
@@ -46,6 +48,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'age' => $request->age,
             'location' => $request->location,
+            'phone_number' => $request->phone_number,
             'password' => Hash::make($request->password),
             'is_admin' => false,
             'active' => true,

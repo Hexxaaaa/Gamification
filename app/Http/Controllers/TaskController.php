@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Task;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
@@ -29,7 +30,7 @@ class TaskController extends Controller
         return view('admin.tasks.create');
     }
 
-    /**
+     /**
      * Store a newly created task in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -43,22 +44,50 @@ class TaskController extends Controller
             'points' => 'required|integer|min:0',
             'status' => 'required|in:pending,active,completed',
             'deadline' => 'required|date|after:today',
-            'video_url' => 'required|url',
+            'video_type' => 'required|in:file,youtube',
+            'video_url' => 'required_if:video_type,youtube|url|nullable',
+            'video_file' => 'required_if:video_type,file|file|mimetypes:video/mp4,video/quicktime|max:102400|nullable',
+            'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'featured' => 'sometimes|boolean',
         ]);
 
-        // Create a new task
-        $task = Task::create($request->all());
+        // Handle thumbnail upload
+        $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
 
-        // Log task creation activity
+        // Handle video based on type
+        $videoUrl = null;
+        if ($request->video_type === 'file') {
+            $videoPath = $request->file('video_file')->store('videos', 'public');
+            $videoUrl = Storage::url($videoPath);
+        } else {
+            $videoUrl = $this->formatYouTubeUrl($request->video_url);
+        }
+
+        // If the new task is featured, unfeature others
+        if ($request->has('featured') && $request->featured) {
+            Task::where('featured', true)->update(['featured' => false]);
+        }
+
+        // Create task with video and thumbnail
+        $task = Task::create([
+            'description' => $request->description,
+            'points' => $request->points,
+            'status' => $request->status,
+            'deadline' => $request->deadline,
+            'video_type' => $request->video_type,
+            'video_url' => $videoUrl,
+            'thumbnail_url' => Storage::url($thumbnailPath),
+            'featured' => $request->featured ?? false, // Set featured
+        ]);
+
         activity()
-            ->causedBy(Auth::user()) // Assuming the admin is authenticated
+            ->causedBy(Auth::user())
             ->performedOn($task)
             ->withProperties(['task_id' => $task->id, 'description' => $task->description])
             ->log('Admin Created Task');
 
-        // Redirect to the tasks index with a success message
         return redirect()->route('admin.tasks.index')
-                         ->with('success', 'Task created successfully.');
+            ->with('success', 'Task created successfully.');
     }
 
     /**
@@ -96,29 +125,61 @@ class TaskController extends Controller
     {
         $task = Task::findOrFail($id);
 
-        // Validate the incoming request data
         $request->validate([
             'description' => 'required|string',
             'points' => 'required|integer|min:0',
             'status' => 'required|in:pending,active,completed',
             'deadline' => 'required|date|after:today',
-            'video_url' => 'required|url',
+            'video_type' => 'required|in:file,youtube',
+            'video_url' => 'required_if:video_type,youtube|url|nullable',
+            'video_file' => 'required_if:video_type,file|file|mimetypes:video/mp4,video/quicktime|max:102400|nullable',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'featured' => 'sometimes|boolean', // Added validation
         ]);
 
-        // Update the task with validated data
-        $task->update($request->all());
+        $data = $request->except(['thumbnail', 'video_file', 'video_url']);
 
-        // Log task update activity
+        // Handle thumbnail update if provided
+        if ($request->hasFile('thumbnail')) {
+            // Delete old thumbnail
+            if ($task->thumbnail_url) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $task->thumbnail_url));
+            }
+            $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
+            $data['thumbnail_url'] = Storage::url($thumbnailPath);
+        }
+
+        // Handle video update
+        if ($request->video_type === 'file' && $request->hasFile('video_file')) {
+            // Delete old video if it was a file
+            if ($task->video_type === 'file' && $task->video_url) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $task->video_url));
+            }
+            $videoPath = $request->file('video_file')->store('videos', 'public');
+            $data['video_url'] = Storage::url($videoPath);
+        } elseif ($request->video_type === 'youtube') {
+            $data['video_url'] = $this->formatYouTubeUrl($request->video_url);
+        }
+
+        // Handle featured status
+        if ($request->has('featured') && $request->featured && !$task->featured) {
+            // Unfeature all other tasks
+            Task::where('featured', true)->update(['featured' => false]);
+        }
+        $data['featured'] = $request->featured ?? $task->featured;
+
+        $task->update($data);
+
         activity()
             ->causedBy(Auth::user())
             ->performedOn($task)
-            ->withProperties(['task_id' => $task->id, 'updated_fields' => $request->all()])
+            ->withProperties(['task_id' => $task->id, 'updated_fields' => $data])
             ->log('Admin Updated Task');
 
-        // Redirect to the tasks index with a success message
         return redirect()->route('admin.tasks.index')
-                         ->with('success', 'Task updated successfully.');
+                        ->with('success', 'Task updated successfully.');
     }
+
 
     /**
      * Remove the specified task from storage.
@@ -140,7 +201,7 @@ class TaskController extends Controller
 
         // Redirect to the tasks index with a success message
         return redirect()->route('admin.tasks.index')
-                         ->with('success', 'Task deleted successfully.');
+            ->with('success', 'Task deleted successfully.');
     }
 
     /**
@@ -155,5 +216,28 @@ class TaskController extends Controller
         }])->get();
 
         return view('admin.tasks.statistics', compact('statistics'));
+    }
+
+     /**
+     * Format YouTube URL to embedded format
+     *
+     * @param string $url
+     * @return string
+     */
+    private function formatYouTubeUrl($url)
+    {
+        $videoId = '';
+        
+        if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $url, $matches)) {
+            $videoId = $matches[1];
+        } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $url, $matches)) {
+            $videoId = $matches[1];
+        } elseif (preg_match('/youtube\.com\/v\/([^\&\?\/]+)/', $url, $matches)) {
+            $videoId = $matches[1];
+        } elseif (preg_match('/youtu\.be\/([^\&\?\/]+)/', $url, $matches)) {
+            $videoId = $matches[1];
+        }
+
+        return 'https://www.youtube.com/embed/' . $videoId;
     }
 }

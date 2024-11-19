@@ -6,10 +6,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
+
 class User extends Authenticatable
 {
-    use Notifiable, HasApiTokens;
+    use Notifiable, HasApiTokens, LogsActivity;
 
     protected $fillable = [
         'name',
@@ -21,21 +21,50 @@ class User extends Authenticatable
         'is_admin',
         'provider',
         'provider_id',
+        'phone_number',
     ];
 
     protected $hidden = [
         'password', 'remember_token',
     ];
 
+    /**
+     * Attributes that should be logged.
+     *
+     * @var array
+     */
+    protected static $logAttributes = [
+        'name',
+        'email',
+        'age',
+        'location',
+        'is_admin',
+        'active',
+        'total_points',
+        'phone_number',
+    ];
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'age', 'location', 'is_admin', 'active', 'total_points'])
-            ->useLogName('user')
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
-    }
+    /**
+     * Only log the changed attributes.
+     *
+     * @var bool
+     */
+    protected static $logOnlyDirty = true;
+
+    /**
+     * Name of the log.
+     *
+     * @var string
+     */
+    protected static $logName = 'user';
+
+    /**
+     * Prevent logging if no attributes have changed.
+     *
+     * @var bool
+     */
+    public static $submitEmptyLogs = false;
+
     // Relationships
     public function userTasks()
     {
@@ -46,7 +75,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserVoucher::class);
     }
-
 
     public function badges()
     {

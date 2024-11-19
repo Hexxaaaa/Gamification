@@ -1,30 +1,37 @@
-<!-- resources/views/standalone_home.blade.php -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Welcome to Our Application</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamification Tanpa Batas</title>
+  <link href="{{ asset('css/index.css') }}" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        @guest
-            <div class="jumbotron text-center">
-                <h1 class="display-4">Welcome to Our Application!</h1>
-                <p class="lead">Join us today and start earning points by completing tasks and redeeming exciting vouchers.</p>
-                <hr class="my-4">
-                <p>
-                    <a class="btn btn-primary btn-lg" href="{{ route('register') }}" role="button">Register</a>
-                    <a class="btn btn-success btn-lg" href="{{ route('login') }}" role="button">Login</a>
-                </p>
-            </div>
-        @else
-            <div class="text-center">
-                <h1 class="display-4">Hello, {{ Auth::user()->name }}!</h1>
-                <p class="lead">Explore the dashboard to manage your tasks and vouchers.</p>
-                <a href="{{ route('user.dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
-            </div>
-        @endguest
+  <header>
+    <div class="logo">
+      <img src="{{ url('gallery/logo.jpg') }}" class="logoatas">
     </div>
+  </header>
+
+  <main class="container">
+    <div class="content">
+      <h1>Gamification Tanpa Batas</h1>
+      <p>Kenapa harus website kami? Karena kami menawarkan berbagai tugas yang dapat diselesaikan dan akan mendapatkan poin yang bisa ditukar dengan saldo atau kupon.</p>
+      <div class="buttons">
+        <a href="/login">
+          <button class="primary">Masuk</button>
+        </a>
+        <a href="/register">
+          <button class="secondary">Daftar Sekarang</button>
+        </a>
+      </div>
+    </div>
+    <div class="image">
+      <img src="{{ url('gallery/index.png') }}" width="500px" alt="gambar-orangduduk">
+    </div>
+  </main>
+
+  <footer>
+  </footer>
 </body>
 </html>

@@ -18,8 +18,8 @@ use Spatie\Activitylog\Models\Activity;
 
 class UserController extends Controller
 {
-    /**
-     * Display the user dashboard.
+     /**
+     * Display the user dashboard with aggregated insights.
      *
      * @return \Illuminate\View\View
      */
@@ -32,7 +32,43 @@ class UserController extends Controller
             ->where('status', 'active')
             ->get();
 
-        return view('user.dashboard', compact('user', 'tasks', 'userTasks', 'vouchers'));
+        // Progress Insights Data
+        $totalTasks = Task::count();
+        $completedTasks = Task::where('status', 'completed')->count();
+        $totalPoints = User::sum('total_points');
+        $completionRate = $totalTasks > 0 ? ($completedTasks / $totalTasks) * 100 : 0;
+
+        // Featured Task
+        $featuredTask = Task::where('featured', true)
+                            ->where('status', 'active')
+                            ->first();
+
+        // Mission Statistics
+        $totalMissions = Task::count(); // Assuming missions are equivalent to tasks
+        $engagedUsers = User::whereHas('userTasks', function ($query) {
+            $query->where('status', 'completed');
+        })->count();
+
+        $gamificationHighlights = [
+            '100% Transparent and Fair Challenges',
+            '90+ Highly Rewarding Missions',
+            '700+ Engaged Users Worldwide',
+        ];
+
+        return view('user.dashboard', compact(
+            'user', 
+            'tasks', 
+            'userTasks', 
+            'vouchers',
+            'totalTasks',
+            'completedTasks',
+            'totalPoints',
+            'completionRate',
+            'featuredTask',
+            'totalMissions',
+            'engagedUsers',
+            'gamificationHighlights'
+        ));
     }
 
     /**

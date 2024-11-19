@@ -22,8 +22,11 @@ use App\Http\Controllers\AuthController;
     //        Home Route
     // ===========================
     Route::get('/', function () {
-        return view('home');
+        return view('auth.index');
     })->name('home');
+    Route::get('/dashboard', function () {
+        return view('auth.dashboard');
+    })->name('dashboard');
 
 // ===========================
 //        Authentication Routes
@@ -37,6 +40,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 // Show Login Form
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+ // ===========================
 
 // Handle Login Submission
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -56,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
     // User Routes
     Route::prefix('user')->name('user.')->group(function () {
         // Dashboard
-        Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+        Route::get('/dashboard', [UserController::class, 'auth.dashboard'])->name('auth.dashboard');
 
         // Task Management
         Route::post('/tasks/{taskId}/start', [UserController::class, 'startTask'])->name('tasks.start');

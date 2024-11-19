@@ -1,0 +1,111 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  header .logo {
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #007BFF;
+  }
+  
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .content {
+    flex: 1 1 40%;
+    padding: 20px;
+  }
+  
+  .content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: #000;
+  }
+  
+  .content p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  
+  .buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  button.primary {
+    background-color: #007BFF;
+    color: white;
+  }
+  
+  button.secondary {
+    background-color: white;
+    color: #007BFF;
+    border: 1px solid #007BFF;
+  }
+  
+  .image {
+    flex: 1 1 50%;
+    text-align: center;
+  }
+  
+  .image img {
+    max-width: 100%;
+    height: auto;
+  }
+  .logoatas{
+    width: 270px;
+    margin-bottom: 1rem;
+    border-radius: 20px;
+  }
+  footer {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  footer .partners span {
+    margin: 0 10px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+      text-align: center;
+    }
+  
+    .content {
+      order: 2;
+      padding: 10px;
+    }
+  
+    .image {
+      order: 1;
+      margin-bottom: 20px;
+    }
+  }
+  

@@ -10,7 +10,7 @@
   
     <div class="container">
         <div class="form">
-            <img src="{{ url('gallery/logo.jpg') }}" class="logoatas"/>
+            <img src="{{ url('gallery/logobrand.png') }}" class="logoatas"/>
             <h2>Sign up into your account</h2>
             <form method="POST" action="{{ route('register.submit') }}">
                 @csrf

@@ -8,15 +8,12 @@
 </head>
 <body>
   <div class="container">
-    <!-- Left section with illustration -->
     <div class="illustration">
       <img src="{{ url('gallery/logologin.jpg') }}" alt="Secure Login Illustration">
     </div>
-
-    <!-- Right section with login form -->
     <div class="login-form">
       <div class="logo">
-        <img src="{{ url('gallery/logo.jpg') }}" class="logoatas">
+        <img src="{{ url('gallery/logobrand.png') }}" class="logoatas">
         <p>Login into your account</p>
       </div>
       <form action="{{ route('login.submit') }}" method="POST">

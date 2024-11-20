@@ -90,8 +90,7 @@
   footer .partners span {
     margin: 0 10px;
   }
-  
-  /* Responsive Design */
+
   @media (max-width: 768px) {
     .container {
       flex-direction: column;

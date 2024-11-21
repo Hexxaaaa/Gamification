@@ -19,7 +19,7 @@ body {
 .icon {
   position: absolute;
   right: 195px;
-  top: 39.4%;
+  top: 37.4%;
   width: 50px;
   height: 45px;
   transform: translateY(-50%);
@@ -32,7 +32,7 @@ body {
 .icon2 {
   position: absolute;
   right: 195px;
-  top: 51%;
+  top: 49%;
   width: 50px;
   height: 45px;
   transform: translateY(-50%);

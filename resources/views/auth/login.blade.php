@@ -16,7 +16,7 @@
         <img src="{{ url('gallery/logobrand.png') }}" class="logoatas">
         <p>Login into your account</p>
       </div>
-      <form action="{{ route('login.submit') }}" method="POST">
+      <form action="{{ route('dashboard') }}">
         @csrf
         <label for="email">Email Id:</label>
         <input type="email" id="email" name="email" placeholder="test@program.com" required>

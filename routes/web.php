@@ -27,8 +27,12 @@ use App\Http\Controllers\AuthController;
     
     Route::get('dashboard', function(){
         return view('auth.dashboard');
+    }
+    )->name('profile');
+    Route::get('profile', function(){
+        return view('auth.profile');
 
-    })->name('dashboard');
+    })->name('profile');
 
 // ===========================
 //        Authentication Routes

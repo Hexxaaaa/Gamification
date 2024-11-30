@@ -65,9 +65,9 @@
                     <a href="{{ route('profile') }}">
                       <img src="{{ url('gallery/userfoto.png') }}" alt="User Profile"  >
                     </a>
-                      <div>
-                          <p>Anon User</p>
-                          <p>User543@gmail.com</p>
+                      <div class="username col-6 offset-3">
+                          <p>Anon User
+                          User543@gmail.com</p>
                       </div>
                   </div>
                   <div class="points2">
@@ -92,7 +92,7 @@
                   </div>
                   <div class="table">
                     <div class="platform">
-                      <img src="{{ url('gallery/logobrand.png') }}" alt="Logo">
+                      <img src="{{ url('gallery/logopointplay.png') }}" alt="Logo">
                     </div>
                     <div><img src="{{ url('gallery/heart.png') }}" class="insightbtn">400</div>
                     <div><img src="{{ url('gallery/comment.png') }}" class="insightbtn">50</div>

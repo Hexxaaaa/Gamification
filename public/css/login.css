@@ -18,8 +18,8 @@ body {
 }
 .icon {
   position: absolute;
-  right: 197px;
-  top: 37.2%;
+  right: 280px;
+  top: 39%;
   width: 50px;
   height: 45px;
   transform: translateY(-50%);
@@ -31,8 +31,8 @@ body {
 }
 .icon2 {
   position: absolute;
-  right: 197px;
-  top: 49%;
+  right: 280px;
+  top: 49.2%;
   width: 50px;
   height: 45px;
   transform: translateY(-50%);

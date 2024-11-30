@@ -1,0 +1,51 @@
+.hero {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    text-align: center;
+  }
+  .balance-card, .progress-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .voucher-section {
+    background-color: #003366;
+    color: white;
+    padding: 2rem;
+  }
+  .voucher-card {
+    background-color: #ffffff;
+    color: #000;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .points-history {
+    margin-top: 2rem;
+  }
+  .navbar {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .profile-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .balance-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+  }

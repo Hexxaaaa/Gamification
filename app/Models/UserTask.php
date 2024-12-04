@@ -21,6 +21,7 @@ class UserTask extends Model
         'status',
         'started_at',
         'completed_at',
+        'completion_date',
         'watched_to_completion', // New field
     ];
 

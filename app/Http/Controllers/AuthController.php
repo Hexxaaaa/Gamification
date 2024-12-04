@@ -87,57 +87,62 @@ class AuthController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function login(Request $request)
-    {
-        // Validate the incoming request data
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
+{
+    // Validate the incoming request data
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
+
+    // Attempt to authenticate the user
+    if (!Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
+        // Log failed login attempt
+        activity()
+            ->withProperties(['email' => $request->email])
+            ->log('Failed Login Attempt');
+
+        // Throw validation exception with error message
+        throw ValidationException::withMessages([
+            'email' => ['Email atau kata sandi salah.'],
         ]);
+    }
 
-        // Attempt to authenticate the user
-        if (!Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
-            // Log failed login attempt
-            activity()
-                ->withProperties(['email' => $request->email])
-                ->log('Failed Login Attempt');
+    // Retrieve the authenticated user
+    $user = Auth::user();
 
-            // Throw validation exception with error message
-            throw ValidationException::withMessages([
-                'email' => ['Email atau kata sandi salah.'],
-            ]);
-        }
-
-        // Retrieve the authenticated user
-        $user = Auth::user();
-
-        // Check if the user's account is active
-        if (!$user->active) {
-            // Log inactive user login attempt
-            activity()
-                ->causedBy($user)
-                ->log('Inactive User Login Attempt');
-
-            // Log the user out
-            Auth::logout();
-
-            // Redirect back with an error message
-            return redirect()->back()
-                             ->withErrors(['email' => 'Akun Anda dinonaktifkan.'])
-                             ->withInput($request->only('email'));
-        }
-
-        // Regenerate the session to prevent session fixation
-        $request->session()->regenerate();
-
-        // Log successful login
+    // Check if the user's account is active
+    if (!$user->active) {
+        // Log inactive user login attempt
         activity()
             ->causedBy($user)
-            ->log('User Logged In');
+            ->log('Inactive User Login Attempt');
 
-        // Redirect to the intended page or user dashboard with a success message
-        return redirect()->intended(route('user.dashboard'))
-                         ->with('success', 'Login berhasil. Selamat datang kembali!');
+        // Log the user out
+        Auth::logout();
+
+        // Redirect back with an error message
+        return redirect()->back()
+                         ->withErrors(['email' => 'Akun Anda dinonaktifkan.'])
+                         ->withInput($request->only('email'));
     }
+
+    // Regenerate the session to prevent session fixation
+    $request->session()->regenerate();
+
+    // Log successful login
+    activity()
+        ->causedBy($user)
+        ->log('User Logged In');
+
+    // Redirect based on user type
+    if ($user->is_admin) {
+        return redirect()->route('admin.dashboard')
+                        ->with('success', 'Login berhasil. Selamat datang kembali!');
+    }
+
+    return redirect()->route('user.dashboard')
+                    ->with('success', 'Login berhasil. Selamat datang kembali!');
+}
 
     /**
      * Handle the logout action.

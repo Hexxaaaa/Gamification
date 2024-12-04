@@ -9,7 +9,7 @@
 <body>
   <header>
     <div class="logo">
-      <img src="{{ url('gallery/logobrand.png') }}" class="logoatas">
+      <img src="{{ url('gallery/logopointplay.png') }}" class="logoatas">
     </div>
   </header>
 

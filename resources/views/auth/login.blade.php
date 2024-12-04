@@ -16,22 +16,7 @@
         <img src="{{ url('gallery/logobrand.png') }}" class="logoatas">
         <p>Login into your account</p>
       </div>
-
-      @if($errors->any())
-        <div class="alert alert-danger">
-            @foreach($errors->all() as $error)
-                <p class="error-message">{{ $error }}</p>
-            @endforeach
-        </div>
-      @endif
-
-      @if(session('error'))
-        <div class="alert alert-danger">
-            <p class="error-message">{{ session('error') }}</p>
-        </div>
-      @endif
-
-      <form action="{{ route('login.submit') }}" method="POST">
+      <form action="{{ route('dashboard') }}">
         @csrf
         <label for="email">Email Id:</label>
         <input type="email" 
@@ -62,11 +47,10 @@
           <span>OR</span>
         </div>
 
-        <button class="btn google-btn">
-          <a href="{{ route('social.redirect', ['provider' => 'google']) }}">
-            Continue with Google
-          </a>
-        </button>
+       <button class="btn google-btn"> <a href="{{ route('social.redirect', ['provider' => 'google']) }}" style="text-decoration: none; color:white;">
+          Continue with Google
+        </a>
+      </button>
         <button type="button" class="btn signup-btn">
           <a href="{{ route('register') }}" class="registers">Sign up</a>
         </button>

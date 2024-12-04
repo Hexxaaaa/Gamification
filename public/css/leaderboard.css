@@ -1,0 +1,124 @@
+.leaderboard-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .navbar {
+    background-color: #fff;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .navbar.scrolled {
+    background-color: #007bff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+  .navbar-brand, .nav-link {
+    transition: color 0.3s ease;
+  }
+  .navbar.scrolled .navbar-brand, 
+  .navbar.scrolled .nav-link {
+    color: #fff !important;
+  }
+  .nav-link:hover {
+    color: #007bff !important;
+    transform: scale(1.1);
+  }
+
+  /* Dropdown Animation */
+  .dropdown-menu {
+    transform: translateY(-20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  .dropdown:hover .dropdown-menu {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Toggler Icon Animation */
+  .navbar-toggler-icon {
+    transition: transform 0.3s ease;
+  }
+  .navbar-toggler.collapsed .navbar-toggler-icon {
+    transform: rotate(180deg);
+  }
+  .leaderboard-bar {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    margin-top: 20px;
+  }
+  .bar {
+    width: 80px;
+    background: #e9ecef;
+    text-align: center;
+    border-radius: 8px;
+    position: relative;
+  }
+  .bar span {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+  }
+  .badge-reward {
+    margin-top: 30px;
+    text-align: center;
+  }
+  .leaderboard-list {
+   margin-top: 20px;
+  }
+  
+  .hidden {
+    visibility: hidden;
+    
+  }
+  
+  .badge-box-container {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.6s ease-out;
+  }
+  
+  .badge-box-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .badge-box {
+    transition: transform 0.3s ease;
+  }
+  
+  .badge-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  .footer {
+    background-color: #ADD8E6;  /* Light blue background */
+    color: white;
+    padding: 20px 0;
+  }
+
+  .social-icons a {
+    margin: 0 15px;
+    text-decoration: none;
+  }
+
+  .social-icons a:hover {
+    opacity: 0.7;
+  }
+  .btn-help {
+    background-color: #007BFF;  /* Blue button */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .btn-help:hover {
+    background-color: #0056b3;  /* Darker blue on hover */
+  }

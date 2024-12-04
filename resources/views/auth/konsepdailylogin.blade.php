@@ -54,11 +54,7 @@
       </div>
     </div>
   </div>
-
-  <footer class="text-center py-3 bg-light">
-    <p>CompanyName @ 202X. All rights reserved.</p>
-  </footer>
-
+  
   <script src="{{ asset('js/dailyreward.js') }}"></script>
 </body>
 <style>

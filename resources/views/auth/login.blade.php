@@ -38,7 +38,7 @@
           <span>OR</span>
         </div>
 
-       <button class="btn google-btn"> <a href="{{ route('social.redirect', ['provider' => 'google']) }}">
+       <button class="btn google-btn"> <a href="{{ route('social.redirect', ['provider' => 'google']) }}" style="text-decoration: none; color:white;">
           Continue with Google
         </a>
       </button>

@@ -3,6 +3,25 @@
     padding: 2rem;
     text-align: center;
   }
+  .navbar {
+    background-color: #fff;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .navbar.scrolled {
+    background-color: #007bff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+  .navbar-brand, .nav-link {
+    transition: color 0.3s ease;
+  }
+  .navbar.scrolled .navbar-brand, 
+  .navbar.scrolled .nav-link {
+    color: #fff !important;
+  }
+  .nav-link:hover {
+    color: #007bff !important;
+    transform: scale(1.1);
+  }
   .balance-card, .progress-card {
     background-color: #fff;
     border-radius: 8px;
@@ -22,7 +41,34 @@
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-
+  .voucher-card {
+    border-radius: 15px;
+    color: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .voucher-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 3px solid #fff;
+  }
+  
+  .carousel-inner {
+    max-width: 500px;
+    margin: auto;
+  }
+  
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    background-size: 50%;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 50px;
+  }
+  
   .points-history {
     margin-top: 2rem;
   }
@@ -32,7 +78,7 @@
   }
   .profile-card {
     background-color: #f8f9fa;
-    border-radius: 8px;
+    border-radius: 100px;
     padding: 1.5rem;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

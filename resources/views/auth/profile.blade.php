@@ -75,7 +75,7 @@
             </thead>
             <tbody>
               <tr>
-                <td><img src="{{ url('gallery/logobrand.png') }}" alt="logoditask"></td>
+                <td><img src="{{ url('gallery/logopointplay.png') }}" alt="logoditask" style="width: 100px"></td>
                 <td>100%</td>
                 <td>100%</td>
                 <td>100%</td>

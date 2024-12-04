@@ -20,7 +20,7 @@
             <ul>
               <li><a href="#">Home</a></li>
               <li><a href="#">Tasks</a></li>
-              <li><a href="#">Rewards</a></li>
+              <li><a href="/rewards">Rewards</a></li>
               <li><a href="#">Leaderboard</a></li>
             </ul>
           </nav>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +46,7 @@ class TaskController extends Controller
             'description' => 'required|string',
             'points' => 'required|integer|min:0',
             'status' => 'required|in:pending,active,completed',
-            'deadline' => 'required|date|after:today',
+            'deadline' => 'required|date|after:now',
             'video_type' => 'required|in:file,youtube',
             'video_url' => 'required_if:video_type,youtube|url|nullable',
             'video_file' => 'required_if:video_type,file|file|mimetypes:video/mp4,video/quicktime|max:102400|nullable',
@@ -74,8 +75,8 @@ class TaskController extends Controller
         $task = Task::create([
             'description' => $request->description,
             'points' => $request->points,
-           'status' => 'active',
-            'deadline' => $request->deadline,
+            'status' => 'active',
+            'deadline' => Carbon::parse($request->deadline)->format('Y-m-d H:i:s'),
             'video_type' => $request->video_type,
             'video_url' => $videoUrl,
             'thumbnail_url' => Storage::url($thumbnailPath),
@@ -132,7 +133,7 @@ class TaskController extends Controller
             'description' => 'required|string',
             'points' => 'required|integer|min:0',
             'status' => 'required|in:pending,active,completed',
-            'deadline' => 'required|date|after:today',
+            'deadline' => 'required|date|after:now',
             'video_type' => 'required|in:file,youtube',
             'video_url' => 'required_if:video_type,youtube|url|nullable',
             'video_file' => 'required_if:video_type,file|file|mimetypes:video/mp4,video/quicktime|max:102400|nullable',
@@ -141,6 +142,9 @@ class TaskController extends Controller
         ]);
 
         $data = $request->except(['thumbnail', 'video_file', 'video_url']);
+
+        // Format deadline
+        $data['deadline'] = Carbon::parse($request->deadline)->format('Y-m-d H:i:s');
 
         // Handle thumbnail update if provided
         if ($request->hasFile('thumbnail')) {

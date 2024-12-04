@@ -23,7 +23,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('user.leaderboard') }}">
+                        <a class="nav-link" href="{{ route('user.leaderboard.index') }}">
                             <i class="bi bi-trophy me-1"></i>Leaderboard
                         </a>
                     </li>

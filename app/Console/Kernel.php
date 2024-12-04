@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('tasks:update-status')->daily();
         $schedule->command('tasks:send-reminders')->weekly();
+        $schedule->command('tasks:expire')->hourly();
     }
 
     /**

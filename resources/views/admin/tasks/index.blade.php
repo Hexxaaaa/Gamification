@@ -14,12 +14,6 @@
         </div>
     </div>
 
-    {{-- @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif --}}
 
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
@@ -32,6 +26,7 @@
                             <th class="border-0">Points</th>
                             <th class="border-0">Status</th>
                             <th class="border-0">Deadline</th>
+                            <th class="border-0">Expiration</th>
                             <th class="border-0">Featured</th>
                             <th class="border-0 rounded-end text-end pe-4">Actions</th>
                         </tr>
@@ -52,8 +47,9 @@
                                 @php
                                     $statusClass = [
                                         'pending' => 'warning',
-                                        'active' => 'primary',
-                                        'completed' => 'success'
+                                        'active' => 'primary', 
+                                        'completed' => 'success',
+                                        'expired' => 'danger'
                                     ][$task->status] ?? 'secondary';
                                 @endphp
                                 <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} rounded-pill">
@@ -62,7 +58,24 @@
                             </td>
                             <td>
                                 <i class="far fa-calendar-alt text-muted me-1"></i>
-                                {{ $task->deadline }}
+                                {{ \Carbon\Carbon::parse($task->deadline)->format('M d, Y H:i') }}
+                            </td>
+                            <td>
+                                @php
+                                    $now = \Carbon\Carbon::now();
+                                    $deadline = \Carbon\Carbon::parse($task->deadline);
+                                    $isExpired = $now->gt($deadline);
+                                @endphp
+                                
+                                @if($isExpired)
+                                    <span class="badge bg-danger-subtle text-danger">
+                                        <i class="fas fa-clock me-1"></i>Expired
+                                    </span>
+                                @else
+                                    <span class="badge bg-success-subtle text-success">
+                                        <i class="fas fa-check-circle me-1"></i>Active
+                                    </span>
+                                @endif
                             </td>
                             <td>
                                 @if($task->featured)

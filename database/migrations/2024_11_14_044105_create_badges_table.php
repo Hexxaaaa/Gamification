@@ -18,6 +18,8 @@ class CreateBadgesTable extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('points_required');
+            $table->integer('level');
+            $table->enum('status', ['collected', 'available', 'locked'])->default('locked');
             $table->timestamps();
         });
     }

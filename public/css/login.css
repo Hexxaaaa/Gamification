@@ -189,3 +189,33 @@ visibility: hidden;
   margin: 0;
   padding: 4px 0;
 }
+
+.input-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 0.8rem;
+  padding-right: 3rem; /* Make room for icon */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 0;
+}
+
+.input-wrapper .icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 35px;
+  height: 35px;
+  color: #fff;
+  background-color: rgb(21, 21, 114);
+  border-radius: 8px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -116,7 +116,7 @@
             @if($inProgressTasks->count() > 0)
                 <div class="list-group mt-4">
                     @foreach($inProgressTasks as $userTask)
-                        <a href="{{ route('user.tasks.show', $userTask->id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <a href="{{ route('user.tasks.show', $userTask->id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-1">{{ $userTask->task->description }}</h5>
                                 <small class="text-muted">Started on: {{ $userTask->created_at }}</small>

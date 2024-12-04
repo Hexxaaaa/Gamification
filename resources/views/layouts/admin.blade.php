@@ -89,7 +89,7 @@
             <div class="admin-brand mb-4">
                 PointPlay Admin
             </div>
-            <div class="nav flex-column">
+                       <div class="nav flex-column">
                 <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fas fa-chart-line me-2"></i> Dashboard
                 </a>
@@ -101,6 +101,9 @@
                 </a>
                 <a href="{{ route('admin.vouchers.index') }}" class="sidebar-link {{ request()->routeIs('admin.vouchers.*') ? 'active' : '' }}">
                     <i class="fas fa-gift me-2"></i> Vouchers
+                </a>
+                <a href="{{ route('admin.badges.index') }}" class="sidebar-link {{ request()->routeIs('admin.badges.*') ? 'active' : '' }}">
+                    <i class="fas fa-award me-2"></i> Badges
                 </a>
                 <a href="{{ route('admin.activities') }}" class="sidebar-link {{ request()->routeIs('admin.activities') ? 'active' : '' }}">
                     <i class="fas fa-history me-2"></i> Activity Logs

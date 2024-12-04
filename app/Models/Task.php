@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Models\Interaction;
 
 class Task extends Model
 {
@@ -61,5 +62,34 @@ class Task extends Model
     public function userTasks()
     {
         return $this->hasMany(UserTask::class);
+    }
+
+     // Add the comments relationship
+     public function comments()
+     {
+         return $this->hasMany(Interaction::class)->where('type', 'comment');
+     }
+ 
+     // Existing interactions relationship
+     public function interactions()
+     {
+         return $this->hasMany(Interaction::class);
+     }
+
+      // Add this method to check if user liked the task
+    public function isLikedByUser($userId)
+    {
+        return $this->interactions()
+            ->where('user_id', $userId)
+            ->where('type', 'like')
+            ->exists();
+    }
+    
+    // Add this accessor for likes count
+    public function getLikesCountAttribute()
+    {
+        return $this->interactions()
+            ->where('type', 'like')
+            ->count();
     }
 }

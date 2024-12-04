@@ -19,9 +19,12 @@ class User extends Authenticatable
         'location',
         'total_points',
         'is_admin',
+        'active',
+        'last_activity',
         'provider',
         'provider_id',
         'phone_number',
+        'profile_image',
     ];
 
     protected $hidden = [
@@ -40,6 +43,7 @@ class User extends Authenticatable
         'location',
         'is_admin',
         'active',
+        'last_activity',
         'total_points',
         'phone_number',
     ];
@@ -85,4 +89,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Interaction::class);
     }
+
+    public function checkIns()
+{
+    return $this->hasMany(DailyCheckIn::class);
+}
 }

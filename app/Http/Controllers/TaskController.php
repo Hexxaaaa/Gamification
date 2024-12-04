@@ -30,7 +30,7 @@ class TaskController extends Controller
         return view('admin.tasks.create');
     }
 
-     /**
+    /**
      * Store a newly created task in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -38,6 +38,8 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('Task creation started');
+        \Log::info($request->all());
         // Validate the incoming request data
         $request->validate([
             'description' => 'required|string',
@@ -72,13 +74,14 @@ class TaskController extends Controller
         $task = Task::create([
             'description' => $request->description,
             'points' => $request->points,
-            'status' => $request->status,
+           'status' => 'active',
             'deadline' => $request->deadline,
             'video_type' => $request->video_type,
             'video_url' => $videoUrl,
             'thumbnail_url' => Storage::url($thumbnailPath),
             'featured' => $request->featured ?? false, // Set featured
         ]);
+        \Log::info($request->all());
 
         activity()
             ->causedBy(Auth::user())
@@ -177,9 +180,8 @@ class TaskController extends Controller
             ->log('Admin Updated Task');
 
         return redirect()->route('admin.tasks.index')
-                        ->with('success', 'Task updated successfully.');
+            ->with('success', 'Task updated successfully.');
     }
-
 
     /**
      * Remove the specified task from storage.
@@ -218,7 +220,7 @@ class TaskController extends Controller
         return view('admin.tasks.statistics', compact('statistics'));
     }
 
-     /**
+    /**
      * Format YouTube URL to embedded format
      *
      * @param string $url
@@ -227,7 +229,7 @@ class TaskController extends Controller
     private function formatYouTubeUrl($url)
     {
         $videoId = '';
-        
+
         if (preg_match('/youtube\.com\/watch\?v=([^\&\?\/]+)/', $url, $matches)) {
             $videoId = $matches[1];
         } elseif (preg_match('/youtube\.com\/embed\/([^\&\?\/]+)/', $url, $matches)) {

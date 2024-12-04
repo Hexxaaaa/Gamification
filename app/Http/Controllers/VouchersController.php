@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Storage;
 
 class VouchersController extends Controller
 {
@@ -42,11 +43,31 @@ class VouchersController extends Controller
             'code' => 'required|string|unique:vouchers,code',
             'points_required' => 'required|integer|min:0',
             'description' => 'required|string',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:active,inactive', 
+            'background_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'user_limit' => 'nullable|integer|min:1', 
+            'expiration_date' => 'nullable|date|after:today',
         ]);
 
+         // Handle image upload
+         if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('vouchers', 'public');
+        } else {
+            $imagePath = null;
+        }
+
         // Create a new voucher
-        $voucher = Voucher::create($request->all());
+        $voucher = Voucher::create([
+            'code' => $request->code,
+            'points_required' => $request->points_required,
+            'description' => $request->description,
+            'status' => $request->status,
+            'background_color' => $request->background_color,
+            'image' => $imagePath,
+            'user_limit' => $request->user_limit,
+            'expiration_date' => $request->expiration_date,
+        ]);
 
         // Log voucher creation activity
         activity()
@@ -93,32 +114,53 @@ class VouchersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
-    {
-        $voucher = Voucher::findOrFail($id);
+    public function update(Request $request, Voucher $voucher)
+{
+    // Validate the incoming request data
+    $request->validate([
+        'code' => 'required|string|unique:vouchers,code,' . $voucher->id,
+        'points_required' => 'required|integer|min:0',
+        'description' => 'required|string',
+        'status' => 'required|in:active,inactive',
+        'background_color' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'user_limit' => 'nullable|integer|min:1',
+        'expiration_date' => 'nullable|date|after:today',
+    ]);
 
-        // Validate the incoming request data
-        $request->validate([
-            'code' => 'required|string|unique:vouchers,code,' . $voucher->id,
-            'points_required' => 'required|integer|min:0',
-            'description' => 'required|string',
-            'status' => 'required|in:active,inactive',
-        ]);
-
-        // Update the voucher with validated data
-        $voucher->update($request->all());
-
-        // Log voucher update activity
-        activity()
-            ->causedBy(Auth::user())
-            ->performedOn($voucher)
-            ->withProperties(['voucher_id' => $voucher->id, 'updated_fields' => $request->all()])
-            ->log('Admin Updated Voucher');
-
-        // Redirect to the vouchers index with a success message
-        return redirect()->route('admin.vouchers.index')
-                         ->with('success', 'Voucher updated successfully.');
+    // Handle image update
+    if ($request->hasFile('image')) {
+        // Delete old image if exists
+        if ($voucher->image) {
+            Storage::disk('public')->delete($voucher->image);
+        }
+        $imagePath = $request->file('image')->store('vouchers', 'public');
+    } else {
+        $imagePath = $voucher->image;
     }
+
+    // Update voucher
+    $voucher->update([
+        'code' => $request->code,
+        'points_required' => $request->points_required,
+        'description' => $request->description,
+        'status' => $request->status,
+        'background_color' => $request->background_color,
+        'image' => $imagePath,
+        'user_limit' => $request->user_limit,
+        'expiration_date' => $request->expiration_date,
+    ]);
+
+    // Log voucher update activity
+    activity()
+        ->causedBy(Auth::user())
+        ->performedOn($voucher)
+        ->withProperties(['voucher_id' => $voucher->id, 'code' => $voucher->code])
+        ->log('Admin Updated Voucher');
+
+    return redirect()->route('admin.vouchers.index')
+                     ->with('success', 'Voucher updated successfully.');
+}
 
     /**
      * Remove the specified voucher from storage.

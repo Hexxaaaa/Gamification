@@ -19,6 +19,9 @@ class CreateVouchersTable extends Migration
             $table->integer('points_required');
             $table->text('description')->nullable();
             $table->enum('status', ['active', 'expired'])->default('active');
+            $table->string('image')->nullable(); // Image field for the voucher
+            $table->integer('user_limit')->nullable(); // User limit for the voucher
+            $table->date('expiration_date')->nullable(); // Expiration date of the voucher
             $table->timestamps();
         });
     }

@@ -67,7 +67,7 @@
                 <div class="tittle2">
                 <h1>Insights that elevate</h1>
                 <h1>your engangement.</h1>
-            </div>
+                </div>
                 <div class="description">
                   Track user participation and progress with real-time analytics designed to optimize engagement and maximize rewards, creating a dynamic and interactive experience.
                 </div>

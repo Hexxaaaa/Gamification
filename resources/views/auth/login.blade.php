@@ -16,14 +16,38 @@
         <img src="{{ url('gallery/logobrand.png') }}" class="logoatas">
         <p>Login into your account</p>
       </div>
+
+      @if($errors->any())
+        <div class="alert alert-danger">
+            @foreach($errors->all() as $error)
+                <p class="error-message">{{ $error }}</p>
+            @endforeach
+        </div>
+      @endif
+
+      @if(session('error'))
+        <div class="alert alert-danger">
+            <p class="error-message">{{ session('error') }}</p>
+        </div>
+      @endif
+
       <form action="{{ route('login.submit') }}" method="POST">
         @csrf
         <label for="email">Email Id:</label>
-        <input type="email" id="email" name="email" placeholder="test@program.com" required>
+        <input type="email" 
+               id="email" 
+               name="email" 
+               placeholder="test@program.com"
+               value="{{ old('email') }}" 
+               required>
         <span class="icon">&#9993;</span>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        <input type="password" 
+               id="password" 
+               name="password" 
+               placeholder="Enter your password" 
+               required>
         <span class="icon2">&#128274;</span>
 
         <div class="forgot-password">
@@ -38,10 +62,11 @@
           <span>OR</span>
         </div>
 
-       <button class="btn google-btn"> <a href="{{ route('social.redirect', ['provider' => 'google']) }}">
-          Continue with Google
-        </a>
-      </button>
+        <button class="btn google-btn">
+          <a href="{{ route('social.redirect', ['provider' => 'google']) }}">
+            Continue with Google
+          </a>
+        </button>
         <button type="button" class="btn signup-btn">
           <a href="{{ route('register') }}" class="registers">Sign up</a>
         </button>

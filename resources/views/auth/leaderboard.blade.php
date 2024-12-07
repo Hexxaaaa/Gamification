@@ -45,39 +45,39 @@
     <div class="row">
       <!-- Left Section -->
       <div class="col-md-8">
-        <div class="leaderboard-card shadow-sm bg-white " style="border-radius: 30px; border: 2px solid black;">
-          <h2 class="text-left">Leaderboard and Badge</h2>
-          <p class="text-left col-6">Track your rank and see how you stack up against others this week</p><br>
-          <div class="leaderboard-bar">
-            <div class="bar" style="height: 100px;">
-              <span class="badge bg-secondary rounded-pill mt-2">1,000</span>
-             <div class="profile-circle" style="margin-top: 50px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid #55C25A; overflow: hidden;">
-                <img src="{{ url('gallery/userfoto.png') }}" alt="logosatu" style="width: 100%; height: 100%; object-fit: cover;">
-              </div>
+        <div class="leaderboard-card shadow-sm bg-white" style="border-radius: 30px; border: 2px solid black;  background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);">
+            <h2 class="text-left">Leaderboard and Badge</h2>
+            <p class="text-left col-6">Track your rank and see how you stack up against others this week</p><br>
+            <div class="leaderboard-bar">
+                <div class="bar star-bar" style="height: 100px; animation: bounce 3s infinite;  background: linear-gradient(45deg, #009FFD, #2A2A72, #70CFFF);">
+                    <span class="badge bg-secondary rounded-pill mt-2">1,000</span>
+                    <div class="profile-circle" style="margin-top: 50px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid #55C25A; overflow: hidden;">
+                        <img src="{{ url('gallery/userfoto.png') }}" alt="logosatu" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                <div class="bar star-bar" style="height: 290px; animation: bounce 3s infinite 0.5s;   background: linear-gradient(45deg, #009FFD, #2A2A72, #70CFFF);">
+                    <span class="badge bg-secondary rounded-pill mt-2">2,900</span>
+                    <div class="profile-circle" style="margin-top: 250px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid black; overflow: hidden;">
+                        <img src="{{ url('gallery/userfoto.png') }}" alt="logosatu" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
+                <div class="bar star-bar" style="height: 230px; animation: bounce 3s infinite 1s;   background: linear-gradient(45deg, #009FFD, #2A2A72, #70CFFF);">
+                    <span class="badge bg-secondary rounded-pill">2,300</span>
+                    <div class="profile-circle" style="margin-top: 180px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid #578EE4; overflow: hidden;">
+                        <img src="{{ url('gallery/userfoto.png') }}" alt="logosatu" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </div>
             </div>
-            <div class="bar" style="height: 290px;">
-              <span class="badge bg-secondary rounded-pill mt-2">2,900</span>
-              <div class="profile-circle" style="margin-top: 250px; width: 80px; height: 80px; border-radius: 50%; border: 4px solid black; overflow: hidden;">
-                <img src="{{ url('gallery/userfoto.png') }}" alt="logosatu" style="width: 100%; height: 100%; object-fit: cover;">
-              </div>
+            <br>
+            <div class="badge-reward">
+                <h5>Badge Reward</h5>
+                <p>Congratulations to our top scorer of the week!</p>
             </div>
-            <div class="bar" style="height: 230px;">
-              <span class="badge bg-secondary rounded-pill">2,300</span>
-              <div class="profile-circle" style="margin-top: 180px; width: 80px; height: 80px; border-radius: 50%;  border: 4px solid #578EE4; overflow: hidden;">
-                <img src="{{ url('gallery/userfoto.png') }}" alt="logosatu" style="width: 100%; height: 100%; object-fit: cover;">
-              </div>
-            </div>
-          </div>
-          <br>
-          <div class="badge-reward">
-            <h5>Badge Reward</h5>
-            <p>Congratulations to our top scorer of the week!</p>
-          </div>
         </div>
-      </div>
+    </div>
       <!-- Right Section -->
      <div class="col-md-4">
-        <div class="leaderboard-list shadow-sm p-3" style="border-radius:30px; border: 2px solid black;">
+        <div class="leaderboard-list shadow-sm p-3" style="border-radius:30px; border: 2px solid black;  background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);">
           <h5 class="text-left">Leaderboard List</h5>
           <p class="text-left" style="font-family: 'Poppins">Visualize your weekly progress</p>
           <ul class="list-group gap-5">

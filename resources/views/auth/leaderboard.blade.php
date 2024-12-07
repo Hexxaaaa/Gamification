@@ -23,7 +23,7 @@
             <a class="nav-link active" aria-current="page" href="/dashboard">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/task">Tasks</a>
+            <a class="nav-link" href="/tasks">Tasks</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/rewards">Rewards</a>

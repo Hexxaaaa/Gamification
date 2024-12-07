@@ -11,116 +11,184 @@
 
     </head>
     <body>
-      <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-          <a class="navbar-brand" href="#">
-            <img src="{{ url('gallery/logopointplay.png') }}" alt="PointPlay Logo" height="40">
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="/dashboard">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/task">Tasks</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/rewards">Rewards</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/leaderboard">Leaderboard</a>
-              </li>
-            </ul>
+      <div class="bagianatas"  style="background-color: #E5EDFF">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+          <div class="container">
+            <a class="navbar-brand" href="#">
+              <img src="{{ url('gallery/logopointplay.png') }}" alt="logobrand" style="width: 100px">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse mt-1" id="navbarNav">
+              <ul class="navbar-nav mx-auto">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/dashboard">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/tasks">Tasks</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/rewards">Rewards</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/leaderboard">Leaderboard</a>
+                </li>
+              </ul>
               <div class="d-flex align-items-center">
-                <img src="{{ url('gallery/userfoto.png') }}" alt="User Profile" class="rounded-circle me-2" height="40">
-              <div>
-                <span class="d-block fw-bold">Anon User</span>
-                <small>21,870 Pts</small>
+                <span class="me-3">Anon User</span>
+                <span class="badge bg-primary">21,870 Pts</span>
               </div>
             </div>
           </div>
+        </nav>
+      
+      <div class="container mt-5">
+        <div class="row">
+            <!-- Profile Section -->
+            <div class="col-md-8">
+                <div class="profile-card d-flex align-items-center" style="background-color: #000d71">
+                    <img src="{{ asset('gallery/userfoto.png') }}" class="rounded-circle me-3" alt="User Image" style="width: 80px">
+                    <div>
+                        <h5 class="text-white">Anon User</h5>
+                        <p class="mb-1 text-white">
+                            🎉 Congratulations! You've leveled up from 
+                            <a href="#" class="text-decoration-none text-primary">Newbie</a> to 
+                            <a href="#" class="text-decoration-none text-primary">Ultra Violet</a>!
+                        </p>
+                        <div class="d-flex">
+                            <a href="#" class="text-decoration-none me-3">@YusufLenang</a>
+                            <a href="#" class="text-decoration-none">@Yusuf32</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance Section -->
+            <div class="col-md-4"style="background-color: #E5EDFF">
+                <div class="balance-card">
+                  <img src="{{ asset('gallery/coindaily.png') }}" alt="" width="40px">
+                    <div class="balance">800</div>
+                    <p>Your Balance</p>
+                    <p class="text-muted">
+                        Earn more points, redeem exciting gifts, and enjoy your TBH experience
+                    </p>
+                </div>
+            </div>
         </div>
-      </nav>
-      <div class="profil-container mt-4" >
-        <div class="row justify-content-between">
-          <div class="col-md-6">
-            <div class="profile-card"style="border-radius:30px; border: 2px solid black;">
-              <img src="{{ url('gallery/userfoto.png') }}" alt="User Avatar" class="rounded-circle mb-3" style=" border-radius: 50%; border: 4px solid rgb(236, 230, 230);">
-              <h5>Anon User</h5>
-              <p class="text-muted mb-1">Rank Progression</p>
-              <p>🎉 Congratulations! You've leveled up from <strong>Newbie</strong> to <strong>Ultra Violet!</strong></p>
-              <div>
-                <a href="#" class="me-3 text-decoration-none">
-                  <img src="{{ url('gallery/instagram.png') }}"  style="width: 20px" > @Username
-                </a>
-                <a href="#" class="text-decoration-none">
-                    <img src="{{ url('gallery/fb.png') }}"  style="width: 20px"> @Username  
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">  
-            <div class="balance-card" style="border-radius:30px; border: 2px solid black;">
-              <h3 class="display-5 text-warning">800</h3>
-              <p class="fw-bold">Your Balance</p>
-              <small>Earn more points, redeem exciting gifts, and enjoy your TBH experience.</small>
-            </div>
-          </div>
+      </div>
+        <!-- Daily Rewards Section -->
+        <div class="daily-rewards mt-5" style="background-color: #E5EDFF">
+            <h3 style="font-family: 'Poppins',sans-serif, font-weight: 500; font-style: normal; font-size: 65px; color: #007DFC ;">Daily Rewards</h3>
+            <p style="font-family: 'Poppins',sans-serif, font-weight: 100; font-style: normal;">Watch Videos Daily, Complete Missions, and Earn Rewards!</p>
+            <p>Collect up to <strong> <img src="{{ asset('gallery/kado.png') }}"  style="width: 22px;">102,400 points</strong></p>
+            <a class="btn btn-primary" href="#" style="border-radius: 200px">Check-in</a>
+            <br>
         </div>
-      </div>        
-  <div class="voucher-section">
-    <div class="container">
-      <h2 class="text-center mb-5">Unlock exclusive perks and maximize your experience.</h2>
-      <div id="voucherCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="voucher-card text-center p-4" style="background: #016646 ;">
-              <img src="{{ url('gallery/starbucks.png') }}" class="rounded-circle mb-3" />
-              <h5 class="text-white" style="font-family: 'Poppins' ">Starbucks</h5>
-              <p class="text-white" style="font-family: 'Poppins'">Total Sale: </p>
-              <p><strong>Rp 15,000</strong></p>
-              <p class="text-white" style="font-family: 'Poppins'">Points Exchanged: <br></p>
-              <p><strong>3,000</strong></p>
-              <button class="btn btn-light w-100 fw-bold" style="color: blue">Redeem</button>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="voucher-card text-center p-4" style="background:#FF9933;">
-              <img src="{{ url('gallery/logoricheese.png') }}" class="rounded-circle mb-3" />
-              <h5 class="text-white">Richeese Factory</h5>
-              <p class="text-white">Total Sale: </p>
-              <p><strong>Rp 50,000</strong></p>
-              <p class="text-white">Points Exchanged: </p>
-              <p><strong>8,000</strong></p>
-              <button class="btn btn-light w-100 fw-bold" style="color: blue">Redeem</button>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <div class="voucher-card text-center p-4" style="background: linear-gradient(135deg, #85d8ce, #7cc6fe);">
-              <img src="{{ url('gallery/KFC.png') }}" class="rounded-circle mb-3" />
-              <h5 class="text-white">KFC</h5>
-              <p class="text-white-50">Total Sale: </p>
-              <p><strong>Rp 100,000</strong></p>
-              <p class="text-white-50">Points Exchanged: </p>
-              <p><strong>20,000</strong></p>
-              <button class="btn btn-light w-100 fw-bold" style="color: blue">Redeem</button>
-            </div>
-          </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#voucherCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon bg-dark rounded-circle" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#voucherCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon bg-dark rounded-circle" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-      </div>      
+      </div>
     </div>
-  </div>
+<br>
+        <!-- Progress Section -->
+        <div class="progress-container">
+          <div class="progress-step complete">
+              <div class="progress-circle complete">
+                <img src="{{ asset('gallery/verified.png') }}" alt="">
+              </div>
+              <div>100% Complete</div>
+              <div class="step-points">Hari-1 50 points</div>
+          </div>
+          <div class="line complete"></div>
+          <div class="progress-step complete">
+            <div class="progress-circle complete">
+              <img src="{{ asset('gallery/verified.png') }}" alt="">
+            </div>
+            <div>100% Complete</div>
+            <div class="step-points">Hari-2 100 points</div>
+        </div>
+        <div class="line complete"></div>
+          <div class="progress-step in-progress">
+              <div class="progress-circle in-progress">
+                <img src="{{ asset('gallery/verifiedblue.png') }}" alt="">
+              </div>
+              <div>60% in Progress</div>
+              <div class="step-points">Hari-3 150 points</div>
+          </div>
+          <div class="line in-progress"></div>
+          <div class="progress-step waiting">
+              <div class="progress-circle waiting">
+                <img src="{{ asset('gallery/verifiedabu.png') }}" alt="">
+              </div>
+              <div class="step-label">Waiting</div>
+              <div class="step-points">Hari-4 200 points</div>
+          </div>
+          <div class="line waiting"></div>
+      </div>
+  
+      <div class="progress-container mt-5">
+        <div class="progress-step waiting">
+            <div class="progress-circle waiting">
+              <img src="{{ asset('gallery/verifiedabu.png') }}" alt="">
+            </div>
+            <div class="step-label">Waiting</div>
+            <div class="step-points">Hari-5 250 points</div>
+        </div>
+        <div class="line waiting"></div>
+        <div class="progress-step waiting">
+            <div class="progress-circle waiting">
+              <img src="{{ asset('gallery/verifiedabu.png') }}" alt="">
+            </div>
+            <div class="step-label">Waiting</div>
+            <div class="step-points">Hari-6 300 points</div>
+        </div>
+        <div class="line waiting"></div>
+        <div class="progress-step waiting">
+            <div class="progress-circle waiting">
+              <img src="{{ asset('gallery/verifiedabu.png') }}" alt="">
+            </div>
+            <div class="step-label">Waiting</div>
+            <div class="step-points">Hari-7 350 points</div>
+        </div>
+        <div class="line waiting"></div>
+    </div>
+
+      
+      
+    <div class="voucher-section">
+      <div class="container">
+        <h2 class="text-center mb-4">Unlock exclusive perks and maximize your experience.</h2>
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-4">
+            <div class="voucher-card text-center p-3" style="background: #016646; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <img src="{{ url('gallery/starbucks.png') }}" class="rounded-circle mb-2" style="width: 60px; height: 60px;" />
+              <h5 class="text-white" style="font-family: 'Poppins'; font-size: 1rem;">Starbucks</h5>
+              <p class="text-white" style="font-family: 'Poppins'; font-size: 0.9rem;">Total Sale: <strong>Rp 15,000</strong></p>
+              <p class="text-white" style="font-family: 'Poppins'; font-size: 0.9rem;">Points Exchanged: <strong>3,000</strong></p>
+              <button class="btn btn-light w-100 fw-bold" style="font-size: 0.9rem; color: blue;">Redeem</button>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="voucher-card text-center p-3" style="background: #FF9933; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <img src="{{ url('gallery/logoricheese.png') }}" class="rounded-circle mb-2" style="width: 60px; height: 60px;" />
+              <h5 class="text-white" style="font-size: 1rem;">Richeese Factory</h5>
+              <p class="text-white" style="font-size: 0.9rem;">Total Sale: <strong>Rp 50,000</strong></p>
+              <p class="text-white" style="font-size: 0.9rem;">Points Exchanged: <strong>8,000</strong></p>
+              <button class="btn btn-light w-100 fw-bold" style="font-size: 0.9rem; color: blue;">Redeem</button>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="voucher-card text-center p-3" style="background: linear-gradient(135deg, #85d8ce, #7cc6fe); border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <img src="{{ url('gallery/KFC.png') }}" class="rounded-circle mb-2" style="width: 60px; height: 60px;" />
+              <h5 class="text-white" style="font-size: 1rem;">KFC</h5>
+              <p class="text-white-50" style="font-size: 0.9rem;">Total Sale: <strong>Rp 100,000</strong></p>
+              <p class="text-white-50" style="font-size: 0.9rem;">Points Exchanged: <strong>20,000</strong></p>
+              <button class="btn btn-light w-100 fw-bold" style="font-size: 0.9rem; color: blue;">Redeem</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
 
   <div class="container points-history-container">
     <div class="row align-items-center">
@@ -193,7 +261,7 @@
 
   </footer>
 
-  
+  <script src="{{ asset('js/rewards.js') }}"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -23,7 +23,7 @@
             <a class="nav-link active" aria-current="page" href="/dashboard">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/task">Tasks</a>
+            <a class="nav-link" href="/tasks">Tasks</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/rewards">Rewards</a>
@@ -76,7 +76,6 @@
     <div class="row mb-3">
         <div class="col-12 text-center">
             <h6 class="text-muted">TOTAL IS IN QUEUE</h6>
-            <h2 style="font-family: 'Poppins', font-weight:500;">Continue Watching</h2>
         </div>
     </div>
 
@@ -133,45 +132,131 @@
     </div>
 </div>
 <div class="container py-5">
-  <h2 class="text-center mb-4">Film Poster Style Cards</h2>
-  <div class="row justify-content-center">
-    <!-- Card 1 -->
-    <div class="col-md-3 mb-4">
-      <div class="card border-0">
-        <img src="https://via.placeholder.com/300x450" class="card-img-top" alt="Image 1">
-        <h5 class="card-title">Movie Title 1</h5>
-        <p class="card-text">Description for Movie 1.</p>
+  <div class="row image-row">
+      <div class="col-md-2 mb-4">
+          <div class="image-container">
+              <img src="{{ asset('gallery/list2gambar1.png') }}" alt="Naruto Figure 1"> 
+          </div>
       </div>
-    </div>
-    <!-- Card 2 -->
-    <div class="col-md-3 mb-4">
-      <div class="card border-0">
-        <img src="https://via.placeholder.com/300x450" class="card-img-top" alt="Image 2">
-        <h5 class="card-title">Movie Title 2</h5>
-        <p class="card-text">Description for Movie 2.</p>
+      <div class="col-md-2 mb-4">
+          <div class="image-container">
+              <img src="{{ asset('gallery/list2gambar2.png') }}" alt="Naruto Figure 2">
+              
+          </div>
       </div>
-    </div>
-    <!-- Card 3 -->
-    <div class="col-md-3 mb-4">
-      <div class="card border-0">
-        <img src="https://via.placeholder.com/300x450" class="card-img-top" alt="Image 3">
-        <h5 class="card-title">Movie Title 3</h5>
-        <p class="card-text">Description for Movie 3.</p>
+      <div class="col-md-2 mb-4">
+          <div class="image-container">
+              <img src="{{ asset('gallery/list2gambar3.png') }}" alt="Naruto Figure 3">
+    
+          </div>
       </div>
-    </div>
-    <!-- Card 4 -->
-    <div class="col-md-3 mb-4">
-      <div class="card border-0">
-        <img src="https://via.placeholder.com/300x450" class="card-img-top" alt="Image 4">
-        <h5 class="card-title">Movie Title 4</h5>
-        <p class="card-text">Description for Movie 4.</p>
+      <div class="col-md-2 mb-4">
+          <div class="image-container">
+              <img src="{{ asset('gallery/list2gambar1.png') }}" alt="Naruto Figure 4">
+          </div>
       </div>
-    </div>
+      <div class="col-md-2 mb-4">
+          <div class="image-container">
+              <img src="{{ asset('gallery/list2gambar4.png') }}" alt="Naruto Figure 5">
+          </div>
+      </div>
   </div>
 </div>
+<div class="container mt-5" style="background-color: #d0e7f9; padding:100px; border-radius:30px;">
+  <div class="text-center">
+      <h5 class="section-title">Earn Special Points every time you finish watching videos!</h5>
+      <p>Every time you finish watching a video, you'll earn special points here! Keep watching videos, commenting, liking, and sharing!</p>
+      <br>
+  </div>
 
+  <div class="row text-center">
+      <!-- First section: Claim your points -->
+      <div class="col-md-3">
+          <div class="icon-section">
+              <img src="{{ asset('gallery/icon1.png') }}" alt="logoicon1footer" style="width: 50px">
+          </div>
+          <p class="section-description">Claim your points after finishing watching the video.</p>
+      </div>
 
+      <!-- Second section: Share the video -->
+      <div class="col-md-3">
+          <div class="icon-section">
+            <img src="{{ asset('gallery/sharetask.png') }}" alt="logoicon1footer" style="width: 50px">
+          </div>
 
+          <p class="section-description">Share the video on social media or with your friends!</p>
+      </div>
+
+      <!-- Third section: Like the video -->
+      <div class="col-md-3">
+          <div class="icon-section">
+            <img src="{{ asset('gallery/like.png') }}" alt="logoicon1footer" style="width: 50px">
+          </div>
+          <p class="section-description">Don't forget to like the video to earn even more points!</p>
+      </div>
+
+      <!-- Fourth section: Leave a comment -->
+      <div class="col-md-3">
+          <div class="icon-section">
+            <img src="{{ asset('gallery/comment.png') }}" alt="logoicon1footer" style="width: 50px;">
+          </div>
+          <p class="section-description">Leave your comment after watching the video about what you think!</p>
+      </div>
+  </div>
+</div>
+<div class="container my-5">
+  <!-- Points Section -->
+  <div class="card  text-white p-3 mb-4" style="background-color: #002366">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h5>Your Points <img src="{{ asset('gallery/coindaily.png') }}" alt="" style="width: 24px; height: 24px; border:2px white;"></h5>
+        
+        <h3>428 <span class="text-warning">= Rp42</span></h3>
+      </div>
+      <button class="btn btn-warning text-dark">Redeem Voucher</button>
+    </div>
+  </div>
+
+  <!-- Task Section -->
+  <div class="card text-white p-3" style="background-color: #002366">
+    <h5 class="col-md-3">Complete today's task and earn rewards!</h5>
+    <h3>Rp10.220 <small>(102,200 points)</small></h3>
+    <div class="my-3 text-center">
+      <p>Watch a video and earn <strong>1,400 points</strong>.</p>
+      <button class="btn btn-danger">Watch</button>
+    </div>
+    <div class="text-left">
+      <button class="btn btn-secondary btn-sm">Watch for 10 minutes</button>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div class="text-center mt-4">
+    <img src="{{ asset('gallery/comment.png') }}" alt="feedbackcomment" style="width: 30px">
+    <a href="#" class="text-dark" style="text-decoration: none">Share your feedback</a> 
+  </div>
+</div>
+<footer class="footer text-center py-4" style="background-color: #E5EDFF">
+  <div class="container">
+    <div class="social-icons">
+      <a href="#" target="_blank" class="icon-link">
+       <img src="{{ asset('gallery/twitter.png') }}" alt="logotwitter" style="width: 15px">
+      </a>
+      <a href="#" target="_blank" class="icon-link">
+          <img src="{{ asset('gallery/fb.png') }}" alt="logofb" style="width: 15px">
+      </a>
+      <a href="#" target="_blank" class="icon-link">
+          <img src="{{ asset('gallery/youtube.png') }}" alt="logofb" style="width: 15px">
+      </a>
+    </div>
+    <div class="help-button mt-3">
+      <a href="/bantuan" class="btn btn-help">Butuh Bantuan?</a>
+    </div>
+  </div>
+</footer>
+<script src="{{ asset('js/tugas.js') }}"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

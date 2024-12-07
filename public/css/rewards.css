@@ -35,39 +35,23 @@
     padding: 2rem;
   }
   .voucher-card {
-    background-color: #ffffff;
-    color: #000;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, filter 0.3s ease;
   }
-  .voucher-card {
-    border-radius: 15px;
-    color: #fff;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  
+  .voucher-card:hover {
+    transform: scale(1.05); /* Slightly enlarge the card */
+    filter: brightness(1.2); /* Slightly increase brightness */
   }
   
   .voucher-card img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border: 3px solid #fff;
+    margin-bottom: 10px;
   }
   
-  .carousel-inner {
-    max-width: 500px;
-    margin: auto;
+  .voucher-card:hover p,
+  .voucher-card:hover h5 {
+    font-weight: bold;
   }
   
-  .carousel-control-prev-icon,
-  .carousel-control-next-icon {
-    background-size: 50%;
-  }
-  
-  .carousel-control-prev,
-  .carousel-control-next {
-    width: 50px;
-  }
   
   .points-history {
     margin-top: 2rem;
@@ -77,21 +61,93 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   .profile-card {
-    background-color: #f8f9fa;
-    border-radius: 100px;
-    padding: 1.5rem;
+    background: #f8f9fa;
+    padding: 130px;
+    border-radius: 10px;
+}
+.balance-card {
+    background: #fff3cd;
+    padding:77px;
+    border-radius: 10px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  .balance-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 1.5rem;
+}
+.balance-card .balance {
+    font-size: 2rem;
+    color: #ff9800;
+}
+.daily-rewards {
+    margin-top: 20px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+}
+.progress-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+.progress-step {
+  text-align: center;
+  flex: 1;
+  position: relative;
+}
+.progress-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-bottom: 5px;
+}
+.progress-icon.complete {
+  background: #28a745;
+}
+.progress-icon.in-progress {
+  background: #007bff;
+}
+.progress-icon.waiting {
+  background: #6c757d;
+}
+.step-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.step-points {
+  font-size: 12px;
+  color: #6c757d;
+}
   footer {
     text-align: center;
     padding: 1rem;
     background-color: #f8f9fa;
   }
+  .line {
+    width: 100px;
+    height: 4px;
+    background: #ccc;
+    align-self: center;
+}
+.line.complete {
+    background: #28a745;
+}
+.line.in-progress {
+    background: #007bff;
+}
+/* Initial state before the element is in view */
+.progress-container {
+  opacity: 0;
+  transform: translateY(100px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Apply when the element is in view */
+.progress-container.slide-up {
+  opacity: 1;
+  transform: translateY(0);
+}

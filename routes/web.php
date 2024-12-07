@@ -1,13 +1,15 @@
 <?php
 
-use App\Http\Controllers\SocialAuthController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\BadgesController;
-use App\Http\Controllers\VouchersController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BadgesController;
+use App\Http\Controllers\FAQController;
+use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\SocialAuthController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VouchersController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,23 +18,7 @@ use App\Http\Controllers\AuthController;
 |
 | Here is where you can register web routes for your application.
 |
-*/
-
- // ===========================
-    //        Home Route
-    // ===========================
-    Route::get('/', function () {
-        return view('home');
-    })->name('home');
-    
-    Route::get('dashboard', function(){
-        return view('auth.dashboard');
-    }
-    )->name('profile');
-    Route::get('profile', function(){
-        return view('auth.profile');
-
-    })->name('profile');
+ */
 
 // ===========================
 //        Authentication Routes
@@ -46,7 +32,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 // Show Login Form
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
- // ===========================
+// ===========================
 
 // Handle Login Submission
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -56,42 +42,52 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/login/{provider}', [SocialAuthController::class, 'redirectToProvider'])->name('social.redirect');
 Route::get('login/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback'])->name('social.callback');
-// ===========================
-//        Protected Routes
-// ===========================
 
-// Apply 'auth' middleware to all protected routes
 Route::middleware(['auth'])->group(function () {
-
     // User Routes
     Route::prefix('user')->name('user.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
         // Task Management
-        Route::post('/tasks/{taskId}/start', [UserController::class, 'startTask'])->name('tasks.start');
+        Route::get('/tasks', [UserController::class, 'tasks'])->name('tasks.index');
         Route::post('/tasks/{taskId}/take', [UserController::class, 'takeTask'])->name('tasks.take');
-        Route::post('/user-tasks/{userTaskId}/complete', [UserController::class, 'completeTask'])->name('userTasks.complete');
+        Route::post('/tasks/{taskId}/start', [UserController::class, 'startTask'])->name('tasks.start');
+        Route::get('/tasks/{userTaskId}', [UserController::class, 'showTask'])->name('tasks.show');
+        Route::post('/tasks/{task}/interaction', [UserController::class, 'logInteraction'])->name('tasks.interaction');
+        Route::post('/tasks/{userTask}/complete', [UserController::class, 'completeTask'])->name('tasks.complete');
+        Route::post('/tasks/{userTask}/watched', [UserController::class, 'markVideoWatched'])->name('tasks.markWatched');
 
         // Voucher Redemption
+        Route::get('/vouchers', [VouchersController::class, 'userIndex'])->name('vouchers.index');
         Route::post('/vouchers/{voucherId}/redeem', [UserController::class, 'redeemVoucher'])->name('vouchers.redeem');
 
         // Leaderboard
-        Route::get('/leaderboard', [UserController::class, 'leaderboard'])->name('leaderboard');
+        Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
 
-        // Interaction Logging
-        Route::post('/tasks/{task}/interaction', [UserController::class, 'logInteraction'])->name('tasks.interaction');
-
+        // badges
+        Route::post('/badges/{id}/claim', [BadgesController::class, 'claim'])->name('badges.claim');
         // Task Statistics
         Route::get('/tasks/statistics', [UserController::class, 'taskStatistics'])->name('tasks.statistics');
 
+        //faq
+        Route::get('/faq', [FAQController::class, 'index'])->name('faq.index');
         // Profile Management
         Route::get('/profile', [UserController::class, 'profile'])->name('profile.show');
-        Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+        Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
+        Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
+
+        Route::get('/check-in-status', [UserController::class, 'checkInStatus'])
+            ->name('check-in.status');
+        Route::post('/check-in', [UserController::class, 'checkIn'])
+            ->name('check-in');
     });
 
-    // Admin Routes
-    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+    Route::group([
+        'middleware' => ['auth', 'admin'], // Add both middlewares
+        'prefix' => 'admin',
+        'as' => 'admin.',
+    ], function () {
         // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
@@ -127,9 +123,24 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/badges/{id}', [BadgesController::class, 'update'])->name('badges.update');
         Route::delete('/badges/{id}', [BadgesController::class, 'destroy'])->name('badges.destroy');
 
+        // User Management
+        Route::get('/users', [AdminController::class, 'indexUsers'])->name('users.index');
+        Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+        Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+        Route::get('/users/{id}', [AdminController::class, 'showUser'])->name('users.show');
+        Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+        Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
+        Route::post('/users/{id}/deactivate', [AdminController::class, 'deactivateUser'])->name('users.deactivate');
+
         // Activity Logs
         Route::get('/activities', [AdminController::class, 'viewActivities'])->name('activities');
     });
-
-   
 });
+
+// ===========================
+//        Home Route
+// ===========================
+Route::get('/', function () {
+    return view('home');
+})->name('home');

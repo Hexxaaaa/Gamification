@@ -16,6 +16,10 @@ class Voucher extends Model
         'points_required',
         'description',
         'status',
+        'background_color',
+        'image',
+        'user_limit',
+        'expiration_date',
     ];
 
     /**
@@ -55,5 +59,19 @@ class Voucher extends Model
     public function userVouchers()
     {
         return $this->hasMany(UserVoucher::class);
+    }
+
+    public function isAvailable()
+    {
+        // Check if the user limit is reached and if the voucher is expired
+        if ($this->userVouchers()->count() >= $this->user_limit) {
+            return false; // No more users can redeem
+        }
+
+        if ($this->status == 'expired' || $this->expiration_date < now()->toDateString()) {
+            return false; // Voucher is expired
+        }
+
+        return true;
     }
 }

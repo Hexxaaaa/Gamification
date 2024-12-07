@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use App\Models\Task;
+use App\Models\User;
+use App\Models\UserTask;
 use App\Models\UserVoucher;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Activitylog\Models\Activity;
+use Storage;
 
 class AdminController extends Controller
 {
@@ -18,49 +21,82 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
+        // Count of active users who are not admins
         $activeUsers = User::where('is_admin', false)->where('active', true)->count();
+
+        // New users in the past month
         $newUsers = User::where('is_admin', false)
-                        ->where('created_at', '>=', now()->subMonth())
-                        ->count();
-        $completedTasks = Task::where('status', 'completed')->count();
-        $totalPoints = User::sum('total_points');
+            ->where('created_at', '>=', now()->subMonth())
+            ->count();
+
+        // Count of completed tasks
+        $completedTasks = DB::table('user_tasks')
+            ->join('tasks', 'user_tasks.task_id', '=', 'tasks.id')
+            ->join('users', 'user_tasks.user_id', '=', 'users.id')
+            ->where('user_tasks.status', 'completed')
+            ->count();
+
+        // Sum of total points from all users
+        $totalPoints = DB::table('user_tasks')
+            ->join('tasks', 'user_tasks.task_id', '=', 'tasks.id')
+            ->where('user_tasks.status', 'completed')
+            ->sum('tasks.points'); //
+
+        // Count of redeemed vouchers
         $redeemedVouchers = UserVoucher::count();
-    
-        // Data for charts/graphs
-        $tasksPerMonth = Task::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
-                            ->groupBy('month')
-                            ->get();
-    
-        // Most Frequently Completed Tasks
+
+        $dailyTasks = UserTask::selectRaw('DATE(completion_date) as date, COUNT(*) as count')
+            ->where('status', 'completed')
+            ->whereDate('completion_date', '>=', now()->subDays(30))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Top 5 most completed tasks
         $topCompletedTasks = Task::select('id', 'video_url', 'description', \DB::raw('COUNT(*) as completion_count'))
-                                  ->where('status', 'completed')
-                                  ->groupBy('id', 'video_url', 'description')
-                                  ->orderByDesc('completion_count')
-                                  ->take(5)
-                                  ->get();
-    
-        // Additional Graph Data
+            ->where('status', 'completed')
+            ->groupBy('id', 'video_url', 'description')
+            ->orderByDesc('completion_count')
+            ->take(5)
+            ->get();
+
+        // User registrations data for charts
         $userRegistrations = User::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-                                 ->where('is_admin', false)
-                                 ->groupBy('date')
-                                 ->orderBy('date')
-                                 ->get();
-    
+            ->where('is_admin', false)
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Voucher redemptions data for charts
         $voucherRedemptions = UserVoucher::selectRaw('DATE(redeemed_at) as date, COUNT(*) as count')
-                                         ->whereNotNull('redeemed_at')
-                                         ->groupBy('date')
-                                         ->orderBy('date')
-                                         ->get();
-    
-        // Usage Trends
+            ->whereNotNull('redeemed_at')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Daily active users
         $dailyActiveUsers = User::where('is_admin', false)
-                                ->where('last_activity', '>=', now()->subDay())
-                                ->count();
-    
+            ->where('last_activity', '>=', now()->subDay())
+            ->count();
+
+        // Monthly active users
         $monthlyActiveUsers = User::where('is_admin', false)
-                                  ->where('last_activity', '>=', now()->subMonth())
-                                  ->count();
-    
+            ->where('last_activity', '>=', now()->subMonth())
+            ->count();
+
+        $taskStatistics = DB::table('tasks')
+            ->leftJoin('user_tasks', 'tasks.id', '=', 'user_tasks.task_id')
+            ->select(
+                'tasks.id',
+                'tasks.description',
+                DB::raw('COUNT(user_tasks.id) as user_tasks_count'),
+                DB::raw('COUNT(DISTINCT user_tasks.user_id) as unique_users_count'),
+                DB::raw('MAX(user_tasks.completion_date) as last_completion') // Changed from completed_at to completion_date
+            )
+            ->where('user_tasks.status', 'completed')
+            ->groupBy('tasks.id', 'tasks.description')
+            ->orderBy('user_tasks_count', 'desc')
+            ->get();
         // Pass all data to the dashboard view
         return view('admin.dashboard', compact(
             'activeUsers',
@@ -68,12 +104,13 @@ class AdminController extends Controller
             'completedTasks',
             'totalPoints',
             'redeemedVouchers',
-            'tasksPerMonth',
+            'dailyTasks',
             'topCompletedTasks',
             'userRegistrations',
             'voucherRedemptions',
             'dailyActiveUsers',
-            'monthlyActiveUsers'
+            'monthlyActiveUsers',
+            'taskStatistics'
         ));
     }
 
@@ -87,8 +124,8 @@ class AdminController extends Controller
     {
         // Optionally, add filters based on request parameters
         $activities = Activity::with(['causer', 'subject'])
-                              ->latest()
-                              ->paginate(20);
+            ->latest()
+            ->paginate(20);
 
         return view('admin.activities', compact('activities'));
     }
@@ -131,17 +168,28 @@ class AdminController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'is_admin' => 'required|boolean',
             'active' => 'required|boolean',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        $data = $request->only(['name', 'email', 'phone_number', 'age', 'location', 'is_admin', 'active']);
+
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $data['profile_image'] = $path;
+        }
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'age' => $request->age,
-            'location' => $request->location,
             'password' => Hash::make($request->password),
-            'is_admin' => $request->is_admin,
-            'active' => $request->active,
+            'profile_image' => $data['profile_image'] ?? null,
+            // Assign other fields...
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone_number' => $data['phone_number'],
+            'age' => $data['age'],
+            'location' => $data['location'],
+            'is_admin' => $data['is_admin'],
+            'active' => $data['active'],
         ]);
 
         activity()
@@ -151,7 +199,7 @@ class AdminController extends Controller
             ->log('Admin Created User');
 
         return redirect()->route('admin.users.index')
-                         ->with('success', 'User added successfully.');
+            ->with('success', 'User added successfully.');
     }
 
     /**
@@ -199,12 +247,26 @@ class AdminController extends Controller
             'active' => 'required|boolean',
             // If updating password, add validation
             'password' => 'nullable|string|min:8|confirmed',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->only(['name', 'email', 'phone_number', 'age', 'location', 'is_admin', 'active']);
 
+        // Handle password update
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+        }
+
+        // Handle profile image upload
+        if ($request->hasFile('profile_image')) {
+            // Delete old profile image jika ada
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+
+            // Simpan gambar baru
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $data['profile_image'] = $path;
         }
 
         $user->update($data);
@@ -212,11 +274,11 @@ class AdminController extends Controller
         activity()
             ->causedBy(auth()->user())
             ->performedOn($user)
-            ->withProperties(['updated_fields' => $request->all()])
+            ->withProperties(['updated_fields' => $data])
             ->log('Admin Updated User');
 
         return redirect()->route('admin.users.index')
-                         ->with('success', 'User updated successfully.');
+            ->with('success', 'User updated successfully.');
     }
 
     /**
@@ -237,7 +299,7 @@ class AdminController extends Controller
             ->log('Admin Deleted User');
 
         return redirect()->route('admin.users.index')
-                         ->with('success', 'User deleted successfully.');
+            ->with('success', 'User deleted successfully.');
     }
 
     /**
@@ -260,6 +322,6 @@ class AdminController extends Controller
             ->log('Admin Deactivated User');
 
         return redirect()->route('admin.users.index')
-                         ->with('success', 'User deactivated successfully.');
+            ->with('success', 'User deactivated successfully.');
     }
 }

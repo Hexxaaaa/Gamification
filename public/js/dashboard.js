@@ -119,3 +119,41 @@ function animatePoints(start, end, element) {
         element.textContent = current.toLocaleString();
     }, 50);
 }
+
+let hasScrolled = false; // To track if the card has already appeared
+
+window.addEventListener('scroll', function() {
+    const card = document.querySelector('.card-progress');
+    let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (currentScroll > 0 && !hasScrolled) {
+        // Scroll Down - Show the card only once
+        card.classList.add('show');
+        hasScrolled = true; // Ensure card is only shown once
+    }
+});
+
+
+
+const posters = document.querySelectorAll('.poster-item');
+    let currentIndex = 0;
+
+    function updateCarousel() {
+      posters.forEach((poster, index) => {
+        if (index === currentIndex) {
+          poster.classList.add('active');
+        } else {
+          poster.classList.remove('active');
+        }
+      });
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % posters.length;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + posters.length) % posters.length;
+      updateCarousel();
+    }

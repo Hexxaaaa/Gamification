@@ -17,6 +17,7 @@ class CreateUserBadgesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('badge_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['locked', 'available', 'collected'])->default('locked');
             $table->timestamps();
         });
     }

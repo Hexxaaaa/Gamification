@@ -13,6 +13,7 @@ use App\Models\Voucher;
 use App\Notifications\BadgeAchieved;
 use App\Notifications\PointsEarned;
 use App\Notifications\TaskCompleted;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,29 @@ use Spatie\Activitylog\Models\Activity;
 
 class UserController extends Controller
 {
+
+    public function index()
+    {
+        $user = Auth::user();
+        $tasks = Task::all();
+
+        // Get user's current badge level
+        $currentBadge = Badge::where('points_required', '<=', $user->total_points)
+            ->orderBy('points_required', 'desc')
+            ->first();
+
+        if (!$currentBadge) {
+            $currentBadge = Badge::orderBy('points_required', 'asc')->first();
+        }
+
+        // Get user's previous badge level
+        $previousBadge = Badge::where('points_required', '<', $currentBadge->points_required)
+            ->orderBy('points_required', 'desc')
+            ->first() ?? Badge::first();
+
+        return view('index', compact('user', 'currentBadge', 'previousBadge'));
+    }
+
     /**
      * Display the user dashboard with aggregated insights.
      *
@@ -29,24 +53,91 @@ class UserController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+        $totalTasks = Task::count();
+$userTasksCount = $user->userTasks()->count();
+// Add null check and fallback to 0 if no tasks exist
+$engagement = $totalTasks > 0 
+    ? round(($userTasksCount / $totalTasks) * 100) 
+    : 0;
 
-        // Get user's interactions
+        // Get real metrics from interactions
         $interactions = $user->interactions()
             ->select('type', DB::raw('count(*) as count'))
             ->groupBy('type')
             ->pluck('count', 'type')
             ->toArray();
 
+        // Default values for the stats table
+        $statsData = [
+            'likes' => $interactions['like'] ?? 400,
+            'comments' => $interactions['comment'] ?? 50,
+            'shares' => $interactions['share'] ?? 34,
+            'engagement' => '8K',
+            'total_score' => number_format($user->total_points ?? 8450),
+        ];
+
         // Get total points and other metrics
         $totalPoints = $user->total_points;
         $totalMissions = Task::where('status', 'active')->count();
         $engagedUsers = User::whereHas('userTasks')->count();
+
+        $missionStats = [
+            'total_missions' => $totalMissions,
+            'engaged_users' => $engagedUsers,
+            'transparency' => 100, // Fixed value since it's a feature claim
+        ];
 
         // Gamification highlights
         $gamificationHighlights = [
             'highly rewarding mission',
             'engaged users worldwide',
             'Transparent and fair challenges',
+        ];
+
+        $cardData = [
+            'userEmail' => $user->email ?? 'User543@gmail.com',
+            'displayDate' => now()->format('F d, Y'),
+            'partnerLogos' => [
+                'axon' => 'gallery/axon.png',
+                'jetstar' => 'gallery/jetstar.png',
+                'expedia' => 'gallery/expedia.png',
+                'qantas' => 'gallery/qantas.png',
+                'alitalia' => 'gallery/alitalia.png',
+            ],
+        ];
+
+        $featuredContent = [
+            [
+                'image' => 'gallery/bilaesokibu.jpeg',
+                'points' => 450,
+            ],
+            [
+                'image' => 'gallery/Agaklaen.jpeg',
+                'points' => 400,
+            ],
+            [
+                'image' => 'gallery/jendelaseribusungai.jpeg',
+                'points' => 320,
+            ],
+            [
+                'image' => 'gallery/Pengantiniblis.jpeg',
+                'points' => 380,
+            ],
+        ];
+
+        // Platform statistics
+        // Platform statistics without fallbacks
+        $platformStats = [
+            'platform_name' => 'PointPlay',
+            'logo' => 'gallery/logopointplay.png',
+            'metrics' => [
+                'likes' => $interactions['like'] ?? 0,
+                'engagement' => $engagement . '%', // Use calculated engagement
+                'comments' => $interactions['comment'] ?? 0,
+                'shares' => $interactions['share'] ?? 0,
+                'reach' => $user->interactions()->distinct('task_id')->count(),
+                'total_score' => number_format($user->total_points ?? 0),
+            ],
         ];
 
         // Featured tasks for slider
@@ -61,8 +152,12 @@ class UserController extends Controller
             'totalPoints',
             'totalMissions',
             'engagedUsers',
+            'missionStats',
             'gamificationHighlights',
-            'featuredTasks'
+            'featuredTasks',
+            'cardData',
+            'platformStats',
+            'featuredContent'
         ));
     }
 
@@ -172,7 +267,7 @@ class UserController extends Controller
             ->withProperties(['user_task_id' => $userTask->id])
             ->log('Task Taken');
 
-        return redirect()->back()->with('success', 'Task taken successfully.');
+        return redirect()->route('user.tasks.show', $userTask->id);
     }
 
     /**
@@ -533,8 +628,7 @@ class UserController extends Controller
             ->withProperties(['updated_fields' => $data])
             ->log('Profile Updated');
 
-        return redirect()->route('user.profile.show')
-            ->with('success', 'Profile updated successfully.');
+        return response()->json(['success' => true, 'message' => 'Profile updated successfully']);
     }
 
     /**
@@ -545,32 +639,32 @@ class UserController extends Controller
     public function checkIn()
     {
         $user = Auth::user();
-        $now = now();
-
+        $now = now(); // This will use the configured timezone
+    
         // Get user's last check-in
         $lastCheckIn = DailyCheckIn::where('user_id', $user->id)
             ->latest()
             ->first();
-
-        // Check if user already checked in today
-        if ($lastCheckIn && $lastCheckIn->last_check_in->isToday()) {
+    
+        // Check if user already checked in today using the correct timezone
+        if ($lastCheckIn && $lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Already checked in today',
+                'message' => 'Already checked in today'
             ], 400);
         }
-
-        // Calculate day count and points
-        $dayCount = 1; // Reset to 1 by default
-
+    
+        // Calculate day count
+        $dayCount = 1; // Default to day 1
+    
         // Only maintain streak if checked in yesterday
-        if ($lastCheckIn && $lastCheckIn->last_check_in->isYesterday()) {
+        if ($lastCheckIn && $lastCheckIn->last_check_in->timezone(config('app.timezone'))->isYesterday()) {
             $dayCount = min($lastCheckIn->day_count + 1, 7);
         }
-
+    
         // Calculate points (50 points × day count)
         $points = 50 * $dayCount;
-
+    
         // Create new check-in record
         DailyCheckIn::create([
             'user_id' => $user->id,
@@ -578,11 +672,11 @@ class UserController extends Controller
             'last_check_in' => $now,
             'points_earned' => $points,
         ]);
-
+    
         // Add points to user
         $user->total_points += $points;
         $user->save();
-
+    
         // Log the check-in activity
         activity()
             ->causedBy($user)
@@ -591,7 +685,7 @@ class UserController extends Controller
                 'points_earned' => $points,
             ])
             ->log('Daily Check-in Complete');
-
+    
         return response()->json([
             'success' => true,
             'points' => $points,
@@ -604,23 +698,82 @@ class UserController extends Controller
  *
  * @return \Illuminate\Http\JsonResponse
  */
-    public function checkInStatus()
+
+ public function checkInStatus()
+ {
+     $user = Auth::user();
+     
+     // Get last check-in using correct timezone
+     $lastCheckIn = DailyCheckIn::where('user_id', $user->id)
+         ->latest()
+         ->first();
+ 
+     $canCheckIn = !$lastCheckIn || 
+         !$lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday();
+ 
+     $currentDay = 0;
+     $streak = 0;
+ 
+     if ($lastCheckIn) {
+         if ($lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday()) {
+             $currentDay = $lastCheckIn->day_count;
+             $streak = $currentDay;
+         } else if ($lastCheckIn->last_check_in->timezone(config('app.timezone'))->isYesterday()) {
+             $currentDay = $lastCheckIn->day_count;
+             $streak = $currentDay;
+         }
+     }
+ 
+     // Calculate next reward
+     $nextDay = min($streak + 1, 7);
+     $nextReward = $nextDay * 50;
+ 
+     return response()->json([
+         'can_check_in' => $canCheckIn,
+         'current_day' => $currentDay,
+         'current_streak' => $streak,
+         'next_reward' => $nextReward,
+     ]);
+ }
+
+    /**
+     * Check if a task is available for the user.
+     *
+     * @param  int  $taskId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkTaskAvailability($taskId)
     {
         $user = Auth::user();
-        $lastCheckIn = DailyCheckIn::where('user_id', $user->id)
-            ->latest()
-            ->first();
+        $task = Task::findOrFail($taskId);
 
-        $canCheckIn = !$lastCheckIn || !$lastCheckIn->last_check_in->isToday();
-        $dayCount = 1;
+        $available = true;
+        $message = '';
 
-        if ($lastCheckIn && $lastCheckIn->last_check_in->isYesterday()) {
-            $dayCount = min($lastCheckIn->day_count + 1, 7);
+        // Check if task is active
+        if ($task->status !== 'active') {
+            $available = false;
+            $message = 'This task is no longer active.';
+        }
+
+        // Check if task has expired
+        if ($task->deadline && Carbon::parse($task->deadline)->isPast()) {
+            $available = false;
+            $message = 'This task has expired.';
+        }
+
+        // Check if user already has this task
+        if ($user->userTasks()->where('task_id', $taskId)->exists()) {
+            $available = false;
+            $message = 'You have already taken this task.';
         }
 
         return response()->json([
-            'can_check_in' => $canCheckIn,
-            'next_reward' => 50 * $dayCount,
+            'available' => $available,
+            'message' => $message ?: 'Task is available',
         ]);
     }
+
+    
+
 }

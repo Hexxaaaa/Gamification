@@ -228,3 +228,21 @@ body {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Efek bersinar */
   transform: scale(1.1); /* Sedikit perbesar saat hover */
 }
+
+.profile-image {
+  transition: transform 0.2s;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0);
+  transition: background-color 0.2s;
+}
+
+.profile-link:hover .profile-image {
+  transform: scale(1.05);
+}
+
+.profile-link:hover .overlay {
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 2px solid #0d6efd;
+}

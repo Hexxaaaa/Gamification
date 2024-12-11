@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Voucher;
 use App\Models\UserVoucher;
+use App\Models\Voucher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Storage;
 
 class VouchersController extends Controller
@@ -89,15 +90,15 @@ class VouchersController extends Controller
      * @return \Illuminate\View\View
      */
     public function show($id)
-{
-    $voucher = Voucher::findOrFail($id);
-    $redemptions = $voucher->userVouchers()
-        ->with('user') // Eager load the user relationship
-        ->latest()
-        ->paginate(10);
+    {
+        $voucher = Voucher::findOrFail($id);
+        $redemptions = $voucher->userVouchers()
+            ->with('user') // Eager load the user relationship
+            ->latest()
+            ->paginate(10);
 
-    return view('admin.vouchers.show', compact('voucher', 'redemptions'));
-}
+        return view('admin.vouchers.show', compact('voucher', 'redemptions'));
+    }
 
     /**
      * Show the form for editing the specified voucher.
@@ -204,7 +205,8 @@ class VouchersController extends Controller
     }
 
     public function userIndex()
-    {
+{
+    try {
         $user = Auth::user();
         $vouchers = Voucher::where('status', 'active')
             ->where(function ($query) {
@@ -213,33 +215,106 @@ class VouchersController extends Controller
             })
             ->get();
 
-        $pointsHistory = UserVoucher::with('voucher')
-            ->where('user_id', $user->id)
-            ->latest()
+        $pointsHistory = UserVoucher::with(['voucher', 'user'])
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
             ->take(6)
             ->get();
 
-        return view('user.vouchers.index', compact('user', 'vouchers', 'pointsHistory'));
+        // Simplified badge loading
+        $user->load(['badges' => function ($query) use ($user) {
+            $query->wherePivot('user_id', $user->id)
+                  ->wherePivot('status', 'collected')
+                  ->orderBy('level', 'asc');
+        }]);
+
+        \Log::info('User badges loaded:', [
+            'user_id' => $user->id,
+            'badges_count' => $user->badges->count(),
+            'badges' => $user->badges->toArray()
+        ]);
+
+        $currentBadge = $user->currentBadge();
+        $previousBadge = $user->badges()
+            ->where('level', '<', $currentBadge ? $currentBadge->level : 1)
+            ->orderBy('level', 'desc')
+            ->first();
+
+        return view('user.vouchers.index', compact('user', 'vouchers', 'pointsHistory', 'currentBadge', 'previousBadge'));
+
+    } catch (\Exception $e) {
+        \Log::error('Error in userIndex:', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return back()->with('error', 'An error occurred while loading badges.');
     }
+}
 
     public function redeemVoucher($voucherId)
-{
-    $user = Auth::user();
-    $voucher = Voucher::findOrFail($voucherId);
+    {
+        $user = Auth::user();
+        $voucher = Voucher::findOrFail($voucherId);
 
-    if ($user->total_points < $voucher->points_required || $voucher->status !== 'active') {
-        return redirect()->back()->with('error', 'Voucher cannot be redeemed.');
+        // First check if voucher is still active
+        if ($voucher->status !== 'active') {
+            return redirect()->back()->with('error', 'This voucher is no longer available.');
+        }
+
+        // Check user points
+        if ($user->total_points < $voucher->points_required) {
+            return redirect()->back()->with('error', 'Insufficient points.');
+        }
+
+        // Check if user has already redeemed this voucher
+        if ($user->userVouchers()->where('voucher_id', $voucherId)->exists()) {
+            return redirect()->back()->with('error', 'You have already redeemed this voucher.');
+        }
+
+        // Check if voucher has reached user limit - Lock for update to prevent race conditions
+        if ($voucher->user_limit) {
+            // Use transaction and lock to ensure accurate count
+            $reachedLimit = DB::transaction(function () use ($voucher) {
+                $currentCount = $voucher->userVouchers()
+                    ->lockForUpdate()
+                    ->count();
+                return $currentCount >= $voucher->user_limit;
+            });
+
+            if ($reachedLimit) {
+                return redirect()->back()->with('error', 'Voucher limit has been reached.');
+            }
+        }
+
+        // Check if voucher has expired
+        if ($voucher->expiration_date && $voucher->expiration_date < now()) {
+            return redirect()->back()->with('error', 'Voucher has expired.');
+        }
+
+        // Create transaction
+        DB::transaction(function () use ($user, $voucher) {
+            // Deduct points from user
+            $user->total_points -= $voucher->points_required;
+            $user->save();
+
+            // Create redemption record
+            UserVoucher::create([
+                'user_id' => $user->id,
+                'voucher_id' => $voucher->id,
+                'redeemed_at' => now(),
+            ]);
+
+            // Log the activity
+            activity()
+                ->causedBy($user)
+                ->performedOn($voucher)
+                ->withProperties([
+                    'points_spent' => $voucher->points_required,
+                    'remaining_points' => $user->total_points,
+                ])
+                ->log('Voucher Redeemed');
+        });
+
+        return redirect()->back()->with('success', 'Voucher redeemed successfully!');
     }
-
-    $user->total_points -= $voucher->points_required;
-    $user->save();
-
-    UserVoucher::create([
-        'user_id' => $user->id,
-        'voucher_id' => $voucher->id,
-        'redeemed_at' => now()
-    ]);
-
-    return redirect()->back()->with('success', 'Voucher redeemed successfully.');
-}
 }

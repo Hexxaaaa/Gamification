@@ -83,7 +83,13 @@ class User extends Authenticatable
 
     public function badges()
     {
-        return $this->belongsToMany(Badge::class, 'user_badges')->withTimestamps();
+        return $this->belongsToMany(Badge::class, 'user_badges')
+                    ->withPivot('status')
+                    ->withTimestamps();
+    }
+    public function userBadges()
+    {
+        return $this->hasMany(UserBadge::class);
     }
 
     public function interactions()
@@ -92,7 +98,24 @@ class User extends Authenticatable
     }
 
     public function checkIns()
-{
-    return $this->hasMany(DailyCheckIn::class);
-}
+    {
+        return $this->hasMany(DailyCheckIn::class);
+    }
+    public function currentBadge()
+    {
+        return $this->badges()
+                    ->whereHas('userBadges', function ($query) {
+                        $query->where('user_id', $this->id)
+                            ->where('status', 'collected');
+                    })
+                    ->orderBy('level', 'desc')
+                    ->first();
+    }
+    public function collectedBadges()
+    {
+        return $this->badges()
+                    ->wherePivot('status', 'collected')
+                    ->orderBy('level', 'asc')
+                    ->get();
+    }
 }

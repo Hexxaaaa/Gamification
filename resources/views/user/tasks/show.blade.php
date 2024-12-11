@@ -14,47 +14,7 @@
 
 <body>
 
-    <header>
-        <nav class="navbar navbar-expand-lg bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand fw-bold text-primary" href="#">
-                    <img src="{{ url('gallery/logopointplay.png') }}" alt="logobrand" style="width: 100px">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/dashboard">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/task">Tasks</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/rewards">Rewards</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/leaderboard">Leaderboard</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="ms-3 d-flex align-items-center">
-                    <span class="points">{{ number_format($userTask->user->total_points) }} PTS</span>
-                    <a href="{{ route('user.profile.show') }}">
-                        @if ($userTask->user->profile_image)
-                            <img src="{{ asset('storage/' . $userTask->user->profile_image) }}"
-                                alt="{{ $userTask->user->name }}'s Avatar" class="rounded-circle ms-2" width="40px">
-                        @else
-                            <img src="{{ url('gallery/userfoto.png') }}" alt="Default Avatar"
-                                class="rounded-circle ms-2" width="40px">
-                        @endif
-                    </a>
-                </div>
-
-            </div>
-        </nav>
-    </header>
+   @include('layouts.header')
 
     <main class="py-5">
         <div class="container">
@@ -310,7 +270,36 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('complete-task-btn').classList.remove('d-none');
+                        // Show completion animation
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Task Completed!',
+                            html: `
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="mb-3">
+                            <i class="fas fa-trophy text-warning fa-3x mb-3"></i>
+                        </div>
+                        <h4 class="text-success mb-2">Congratulations!</h4>
+                        <p class="mb-3">You've earned {{ number_format($userTask->task->points) }} points</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <span class="badge bg-primary rounded-pill px-3">
+                                <i class="fas fa-star me-1"></i>Task Complete
+                            </span>
+                            <span class="badge bg-warning rounded-pill px-3">
+                                <i class="fas fa-coins me-1"></i>+{{ number_format($userTask->task->points) }} pts
+                            </span>
+                        </div>
+                    </div>
+                `,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Claim Rewards!',
+                            confirmButtonClass: 'btn btn-success rounded-pill px-4',
+                            allowOutsideClick: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                document.getElementById('complete-task-btn').click();
+                            }
+                        });
                     }
                 });
         }

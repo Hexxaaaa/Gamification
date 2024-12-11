@@ -66,10 +66,7 @@ class TaskController extends Controller
             $videoUrl = $this->formatYouTubeUrl($request->video_url);
         }
 
-        // If the new task is featured, unfeature others
-        if ($request->has('featured') && $request->featured) {
-            Task::where('featured', true)->update(['featured' => false]);
-        }
+
 
         // Create task with video and thumbnail
         $task = Task::create([
@@ -168,12 +165,7 @@ class TaskController extends Controller
             $data['video_url'] = $this->formatYouTubeUrl($request->video_url);
         }
 
-        // Handle featured status
-        if ($request->has('featured') && $request->featured && !$task->featured) {
-            // Unfeature all other tasks
-            Task::where('featured', true)->update(['featured' => false]);
-        }
-        $data['featured'] = $request->featured ?? $task->featured;
+       
 
         $task->update($data);
 
@@ -246,4 +238,6 @@ class TaskController extends Controller
 
         return 'https://www.youtube.com/embed/' . $videoId;
     }
+
+
 }

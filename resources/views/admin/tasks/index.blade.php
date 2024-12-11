@@ -45,15 +45,16 @@
                             </td>
                             <td>
                                 @php
+                                    $status = $task->getCurrentStatus();
                                     $statusClass = [
                                         'pending' => 'warning',
                                         'active' => 'primary', 
                                         'completed' => 'success',
                                         'expired' => 'danger'
-                                    ][$task->status] ?? 'secondary';
+                                    ][$status] ?? 'secondary';
                                 @endphp
                                 <span class="badge bg-{{ $statusClass }}-subtle text-{{ $statusClass }} rounded-pill">
-                                    {{ ucfirst($task->status) }}
+                                    {{ ucfirst($status) }}
                                 </span>
                             </td>
                             <td>

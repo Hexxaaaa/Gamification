@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BadgesController;
 use App\Http\Controllers\FAQController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\MovieController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
@@ -50,7 +51,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
 
         // Task Management
-        Route::get('/tasks', [UserController::class, 'tasks'])->name('tasks.index');
+        Route::get('/tasks', [MovieController::class, 'index'])->name('tasks.index');
+        Route::get('/tasks/search', [MovieController::class, 'search'])->name('tasks.search');
+        Route::get('/tasks/{taskId}/check', [UserController::class, 'checkTaskAvailability'])->name('tasks.check');
         Route::post('/tasks/{taskId}/take', [UserController::class, 'takeTask'])->name('tasks.take');
         Route::post('/tasks/{taskId}/start', [UserController::class, 'startTask'])->name('tasks.start');
         Route::get('/tasks/{userTaskId}', [UserController::class, 'showTask'])->name('tasks.show');
@@ -77,10 +80,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
         Route::put('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 
-        Route::get('/check-in-status', [UserController::class, 'checkInStatus'])
-            ->name('check-in.status');
-        Route::post('/check-in', [UserController::class, 'checkIn'])
-            ->name('check-in');
+        Route::post('/checkin', [UserController::class, 'checkIn'])->name('checkin');
+        Route::get('/checkin-status', [UserController::class, 'checkInStatus'])->name('checkin.status');
+
     });
 
     Route::group([

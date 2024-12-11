@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
+use App\Models\UserBadge;
 
 class Badge extends Model
 {
@@ -27,5 +28,9 @@ class Badge extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_badges')->withTimestamps();
+    }
+    public function userBadges()
+    {
+        return $this->hasMany(UserBadge::class);
     }
 }

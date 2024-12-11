@@ -9,38 +9,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="{{ asset('gallery/logopointplay.png') }}" alt="PointPlay Logo" width="100px">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mx-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('user.dashboard') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/task">Tasks</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/rewards">Rewards</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/leaderboard">Leaderboard</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('gallery/userfoto.png') }}" alt="User Avatar" class="rounded-circle"
-                        width="40px">
-                    <span class="ms-2">Anon User</span>
-                    <span class="ms-2 badge bg-primary">21,870 Pts</span>
-                </div>
-            </div>
-        </div>
-    </nav>
+    @include('layouts.header')
 
     <div class="container my-5">
         <h2 class="fw-bold mb-4" style="font-family: 'Poppins'; font-weight:500">Frequently Asked Questions</h2>

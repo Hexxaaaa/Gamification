@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Interaction;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
-use App\Models\Interaction;
 
 class Task extends Model
 {
@@ -64,19 +65,19 @@ class Task extends Model
         return $this->hasMany(UserTask::class);
     }
 
-     // Add the comments relationship
-     public function comments()
-     {
-         return $this->hasMany(Interaction::class)->where('type', 'comment');
-     }
- 
-     // Existing interactions relationship
-     public function interactions()
-     {
-         return $this->hasMany(Interaction::class);
-     }
+    // Add the comments relationship
+    public function comments()
+    {
+        return $this->hasMany(Interaction::class)->where('type', 'comment');
+    }
 
-      // Add this method to check if user liked the task
+    // Existing interactions relationship
+    public function interactions()
+    {
+        return $this->hasMany(Interaction::class);
+    }
+
+    // Add this method to check if user liked the task
     public function isLikedByUser($userId)
     {
         return $this->interactions()
@@ -84,12 +85,39 @@ class Task extends Model
             ->where('type', 'like')
             ->exists();
     }
-    
+
     // Add this accessor for likes count
     public function getLikesCountAttribute()
     {
         return $this->interactions()
             ->where('type', 'like')
             ->count();
+    }
+
+    public function getCurrentStatus()
+    {
+        if ($this->status === 'completed') {
+            return 'completed';
+        }
+
+        if ($this->deadline && Carbon::parse($this->deadline)->isPast()) {
+            // Update the status in database
+            $this->update(['status' => 'expired']);
+            return 'expired';
+        }
+
+        return $this->status;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::retrieved(function ($task) {
+            if ($task->deadline && Carbon::parse($task->deadline)->isPast() && $task->status === 'active') {
+                $task->status = 'expired';
+                $task->save();
+            }
+        });
     }
 }

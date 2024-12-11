@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Badge;
+use App\Models\UserBadge;
+use App\Notifications\BadgeAchieved;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -97,19 +99,75 @@ class BadgesController extends Controller
         $user = Auth::user();
         $badge = Badge::findOrFail($id);
 
-        if ($user->total_points >= $badge->points_required) {
-            $user->badges()->attach($badge->id);
-            $badge->update(['status' => 'collected']);
+        \Log::info('Claiming badge', [
+            'user_id' => $user->id,
+            'badge_id' => $badge->id,
+            'user_points' => $user->total_points,
+            'badge_points' => $badge->points_required,
+        ]);
 
+        // Check if user already has this badge
+        $userBadge = $user->userBadges()->where('badge_id', $id)->first();
+        if ($userBadge && $userBadge->status === 'collected') {
+            return redirect()->back()->with('error', 'You have already claimed this badge.');
+        }
+
+        // Check if user has enough points
+        if ($user->total_points >= $badge->points_required) {
+            if (!$userBadge) {
+                $userBadge = new UserBadge([
+                    'user_id' => $user->id,
+                    'badge_id' => $badge->id,
+                    'status' => 'collected',
+                ]);
+            } else {
+                $userBadge->status = 'collected';
+            }
+            $userBadge->save();
+
+            // Notify user
+            $user->notify(new BadgeAchieved($badge));
+
+            // Log the activity
             activity()
                 ->causedBy($user)
                 ->performedOn($badge)
-                ->withProperties(['badge_id' => $badge->id])
+                ->withProperties([
+                    'badge_id' => $badge->id,
+                    'points_required' => $badge->points_required,
+                    'user_points' => $user->total_points,
+                ])
                 ->log('Badge Claimed');
 
             return redirect()->back()->with('success', 'Badge claimed successfully!');
         }
 
         return redirect()->back()->with('error', 'You do not have enough points to claim this badge.');
+    }
+
+    public function leaderboardBadges()
+    {
+        $user = auth()->user();
+
+        $badges = Badge::orderBy('level', 'asc')->get()->map(function ($badge) use ($user) {
+            // Check if user has claimed this badge
+            $userBadge = $user->userBadges()->where('badge_id', $badge->id)->first();
+            if ($userBadge) {
+                $status = $userBadge->status;
+            } elseif ($user->total_points >= $badge->points_required) {
+                $status = 'available';
+            } else {
+                $status = 'locked';
+            }
+
+            return [
+                'id' => $badge->id,
+                'level' => $badge->level,
+                'points' => $badge->points_required,
+                'status' => $status,
+            ];
+        });
+
+        return $badges;
     }
 }

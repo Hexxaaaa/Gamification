@@ -28,7 +28,7 @@
                          placeholder="test@program.com"
                          value="{{ old('email') }}" 
                          required>
-                  <span class="icon">&#9993;</span>
+                  <span class="icon2">&#9993;</span>
                 </div>
 
                 <label for="password">Password:</label>
@@ -38,7 +38,7 @@
                          name="password" 
                          placeholder="Enter your password" 
                          required>
-                  <span class="icon">&#128274;</span>
+                  <span class="icon2">&#128274;</span>
                 </div>
 
                 <div class="forgot-password">

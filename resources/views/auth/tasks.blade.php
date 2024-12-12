@@ -6,8 +6,15 @@
   <title>Card Layout with Bootstrap</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="{{ asset('css/tugas.css') }}">
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 </head>
+<style>
+  *{
+  font-family: 'Poppins',serif; font-weight:500; font-style: normal;
+}
+</style>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
@@ -135,29 +142,34 @@
   <div class="row image-row">
       <div class="col-md-2 mb-4">
           <div class="image-container">
-              <img src="{{ asset('gallery/list2gambar1.png') }}" alt="Naruto Figure 1"> 
+            <a href="/video">
+              <img src="{{ asset('gallery/list2gambar1.png') }}" alt="Naruto Figure 1"> </a>
           </div>
       </div>
       <div class="col-md-2 mb-4">
           <div class="image-container">
-              <img src="{{ asset('gallery/list2gambar2.png') }}" alt="Naruto Figure 2">
+            <a href="/video">
+              <img src="{{ asset('gallery/list2gambar2.png') }}" alt="Naruto Figure 2"></a>
               
           </div>
       </div>
       <div class="col-md-2 mb-4">
           <div class="image-container">
-              <img src="{{ asset('gallery/list2gambar3.png') }}" alt="Naruto Figure 3">
+            <a href="/video">
+              <img src="{{ asset('gallery/list2gambar3.png') }}" alt="Naruto Figure 3"></a>
     
           </div>
       </div>
       <div class="col-md-2 mb-4">
           <div class="image-container">
-              <img src="{{ asset('gallery/list2gambar1.png') }}" alt="Naruto Figure 4">
+            <a href="/video">
+              <img src="{{ asset('gallery/list2gambar1.png') }}" alt="Naruto Figure 4"></a>
           </div>
       </div>
       <div class="col-md-2 mb-4">
           <div class="image-container">
-              <img src="{{ asset('gallery/list2gambar4.png') }}" alt="Naruto Figure 5">
+            <a href="/video">
+              <img src="{{ asset('gallery/list2gambar4.png') }}" alt="Naruto Figure 5"></a>
           </div>
       </div>
   </div>

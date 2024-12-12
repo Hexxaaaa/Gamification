@@ -135,25 +135,43 @@ window.addEventListener('scroll', function() {
 
 
 
-const posters = document.querySelectorAll('.poster-item');
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.querySelector('.movie-carousel');
+    const prevBtn = document.querySelector('.carousel-nav.prev');
+    const nextBtn = document.querySelector('.carousel-nav.next');
+    const cardWidth = 320; // card width + gap
     let currentIndex = 0;
 
     function updateCarousel() {
-      posters.forEach((poster, index) => {
-        if (index === currentIndex) {
-          poster.classList.add('active');
-        } else {
-          poster.classList.remove('active');
+        carousel.style.transform = `translateX(-${currentIndex * cardWidth}px)`;
+        
+        // Update button states
+        prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+        prevBtn.style.cursor = currentIndex === 0 ? 'default' : 'pointer';
+        
+        const maxIndex = document.querySelectorAll('.movie-card').length - Math.floor(carousel.parentElement.offsetWidth / cardWidth);
+        nextBtn.style.opacity = currentIndex >= maxIndex ? '0.5' : '1';
+        nextBtn.style.cursor = currentIndex >= maxIndex ? 'default' : 'pointer';
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateCarousel();
         }
-      });
-    }
+    });
 
-    function nextSlide() {
-      currentIndex = (currentIndex + 1) % posters.length;
-      updateCarousel();
-    }
+    nextBtn.addEventListener('click', () => {
+        const maxIndex = document.querySelectorAll('.movie-card').length - Math.floor(carousel.parentElement.offsetWidth / cardWidth);
+        if (currentIndex < maxIndex) {
+            currentIndex++;
+            updateCarousel();
+        }
+    });
 
-    function prevSlide() {
-      currentIndex = (currentIndex - 1 + posters.length) % posters.length;
-      updateCarousel();
-    }
+    // Initial update
+    updateCarousel();
+
+    // Update on window resize
+    window.addEventListener('resize', updateCarousel);
+});

@@ -78,6 +78,168 @@ body {
   background-color: #0056b3;
 }
 
+/* Carousel Container */
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+}
+
+/* Movie Carousel */
+.movie-carousel {
+  display: flex;
+  gap: 20px;
+  transition: transform 0.5s ease;
+  padding: 0 20px;
+}
+
+/* Movie Card */
+.movie-card {
+  flex: 0 0 300px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.movie-card:hover {
+  transform: scale(1.05);
+}
+
+.movie-image {
+  width: 100%;
+  height: 450px;
+  object-fit: cover;
+}
+
+/* Overlay */
+.movie-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.movie-card:hover .movie-overlay {
+  opacity: 1;
+}
+
+/* Movie Content */
+.movie-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  color: white;
+}
+
+.movie-title {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.movie-info {
+  font-size: 0.875rem;
+  margin-bottom: 15px;
+}
+
+.separator {
+  margin: 0 8px;
+}
+
+/* Navigation Buttons */
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.carousel-nav:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.carousel-nav.prev {
+  left: 10px;
+}
+
+.carousel-nav.next {
+  right: 10px;
+}
+
+.carousel-arrow {
+  line-height: 1;
+}
+
+/* Movie Buttons */
+.movie-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-outline-light {
+  background: rgba(255,255,255,0.1);
+}
+
+.engagement-section {
+  background-color: #0b2242; /* Warna biru tua */
+  color: white;
+  padding: 50px;
+  border-radius: 10px;
+  text-align: center;
+}
+.engagement-section h1 {
+  font-weight: bold;
+}
+.engagement-section p {
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+.stats {
+  margin: 40px 0;
+}
+
+.stats h3 {
+  font-size: 2.5rem;
+}
+
+.stats p {
+  color: gray;
+  font-size: 1rem;
+}
+
+
+.icon a img {
+  width: 35px; /* Ukuran ikon */
+  filter: invert(1); /* Membalik warna menjadi putih */
+  border: 2px solid transparent; /* Stroke awal transparan */
+  border-radius: 50%; /* Membuat lingkaran */
+  transition: all 0.3s ease-in-out; /* Animasi hover */
+}
+
+.icon a img:hover {
+  border-color: white; /* Stroke putih saat hover */
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Efek bersinar */
+  transform: scale(1.1); /* Sedikit perbesar saat hover */
+}
+
+
 
 .card-progress {
   width: 100%;
@@ -184,47 +346,4 @@ body {
 .poster-content .btn {
   font-size: 0.7rem;
   padding: 5px 10px;
-}
-
-.engagement-section {
-  background-color: #0b2242; /* Warna biru tua */
-  color: white;
-  padding: 50px;
-  border-radius: 10px;
-  text-align: center;
-}
-.engagement-section h1 {
-  font-weight: bold;
-}
-.engagement-section p {
-  margin-top: 20px;
-  font-size: 1.1rem;
-}
-
-.stats {
-  margin: 40px 0;
-}
-
-.stats h3 {
-  font-size: 2.5rem;
-}
-
-.stats p {
-  color: gray;
-  font-size: 1rem;
-}
-
-
-.icon a img {
-  width: 35px; /* Ukuran ikon */
-  filter: invert(1); /* Membalik warna menjadi putih */
-  border: 2px solid transparent; /* Stroke awal transparan */
-  border-radius: 50%; /* Membuat lingkaran */
-  transition: all 0.3s ease-in-out; /* Animasi hover */
-}
-
-.icon a img:hover {
-  border-color: white; /* Stroke putih saat hover */
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); /* Efek bersinar */
-  transform: scale(1.1); /* Sedikit perbesar saat hover */
 }

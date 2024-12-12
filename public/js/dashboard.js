@@ -132,35 +132,3 @@ window.addEventListener('scroll', function() {
         hasScrolled = true; // Ensure card is only shown once
     }
 });
-
-
-
-const posters = document.querySelectorAll('.poster-item');
-    let currentIndex = 0;
-
-    function updateCarousel() {
-      posters.forEach((poster, index) => {
-        if (index === currentIndex) {
-          poster.classList.add('active');
-        } else {
-          poster.classList.remove('active');
-        }
-      });
-    }
-
-    function nextSlide() {
-      currentIndex = (currentIndex + 1) % posters.length;
-      updateCarousel();
-    }
-
-    function prevSlide() {
-      currentIndex = (currentIndex - 1 + posters.length) % posters.length;
-      updateCarousel();
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    });

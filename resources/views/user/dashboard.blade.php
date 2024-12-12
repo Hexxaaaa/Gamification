@@ -131,50 +131,101 @@
                 </div>
             </div>
         </div>
-
-
-        <div class="container mt-5">
-            <div id="posterCarousel" class="poster-carousel">
-                <!-- Poster 1 -->
-                <div class="poster-item active">
-                    <img src="{{ asset('gallery/bilaesokibu.jpeg') }}" alt="Annabelle">
-                    <div class="poster-content">
-                        <span class="badge bg-warning text-dark mb-4">450</span>
+        <div class="container py-5">
+            <h1 class=" text-black mb-4">Featured Movies</h1>
+            
+            <div class="carousel-container position-relative">
+                <!-- Navigation Buttons -->
+                <button class="carousel-nav prev" aria-label="Previous">
+                    <span class="carousel-arrow">‹</span>
+                </button>
+                <button class="carousel-nav next" aria-label="Next">
+                    <span class="carousel-arrow">›</span>
+                </button>
+    
+                <!-- Movie Cards Container -->
+                <div class="movie-carousel">
+                    <!-- Movie Card 1 -->
+                    <div class="movie-card">
+                        <img src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=800&q=80" alt="The Haunting" class="movie-image">
+                        <div class="movie-overlay">
+                            <div class="movie-content">
+                                <h3 class="movie-title">The Haunting</h3>
+                                <div class="movie-info">
+                                    <span>1:45:00</span>
+                                    <span class="separator">•</span>
+                                    <span>HORROR, ACTION</span>
+                                </div>
+                                <div class="movie-buttons">
+                                    <button class="btn btn-light btn-sm">WATCH</button>
+                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Movie Card 2 -->
+                    <div class="movie-card">
+                        <img src="https://images.unsplash.com/photo-1494236536165-dab4d859818b?auto=format&fit=crop&w=800&q=80" alt="Dark Woods" class="movie-image">
+                        <div class="movie-overlay">
+                            <div class="movie-content">
+                                <h3 class="movie-title">Dark Woods</h3>
+                                <div class="movie-info">
+                                    <span>2:15:00</span>
+                                    <span class="separator">•</span>
+                                    <span>HORROR, THRILLER</span>
+                                </div>
+                                <div class="movie-buttons">
+                                    <button class="btn btn-light btn-sm">WATCH</button>
+                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Movie Card 3 -->
+                    <div class="movie-card">
+                        <img src="https://images.unsplash.com/photo-1515634928627-2a4e0dae3ddf?auto=format&fit=crop&w=800&q=80" alt="Night City" class="movie-image">
+                        <div class="movie-overlay">
+                            <div class="movie-content">
+                                <h3 class="movie-title">Night City</h3>
+                                <div class="movie-info">
+                                    <span>1:55:00</span>
+                                    <span class="separator">•</span>
+                                    <span>ACTION, DRAMA</span>
+                                </div>
+                                <div class="movie-buttons">
+                                    <button class="btn btn-light btn-sm">WATCH</button>
+                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Movie Card 4 -->
+                    <div class="movie-card">
+                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80" alt="The Last Stand" class="movie-image">
+                        <div class="movie-overlay">
+                            <div class="movie-content">
+                                <h3 class="movie-title">The Last Stand</h3>
+                                <div class="movie-info">
+                                    <span>2:30:00</span>
+                                    <span class="separator">•</span>
+                                    <span>ACTION, FANTASY</span>
+                                </div>
+                                <div class="movie-buttons">
+                                    <button class="btn btn-light btn-sm">WATCH</button>
+                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Poster 2 -->
-                <div class="poster-item">
-                    <img src="{{ asset('gallery/Agaklaen.jpeg') }}" alt="Other Movie">
-                    <div class="poster-content">
-                        <span class="badge bg-warning text-dark mb-4">400</span>
-                    </div>
-                </div>
-
-                <!-- Poster 3 -->
-                <div class="poster-item">
-                    <img src="{{ asset('gallery/jendelaseribusungai.jpeg') }}" alt="Another Movie">
-                    <div class="poster-content">
-                        <span class="badge bg-warning text-dark mb-4">320</span>
-
-                    </div>
-                </div>
-
-                <!-- Poster 4 -->
-                <div class="poster-item">
-                    <img src="{{ asset('gallery/Pengantiniblis.jpeg') }}" alt="Fourth Movie">
-                    <div class="poster-content">
-                        <span class="badge bg-warning text-dark mb-4">380</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="d-flex justify-content-center mt-3">
-                <button class="btn btn-primary me-2" onclick="prevSlide()">Previous</button>
-                <button class="btn btn-primary" onclick="nextSlide()">Next</button>
             </div>
         </div>
+
+
+
         <br><br><br>
         <div class="container text-center">
             <h4 class="text-primary mt-4">OUR MISSION</h4>

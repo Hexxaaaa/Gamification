@@ -132,7 +132,7 @@
             </div>
         </div>
         <div class="container py-5">
-            <h1 class=" text-black mb-4">Featured Movies</h1>
+            <h1 class=" text-black mb-4">Featured Video</h1>
             
             <div class="carousel-container position-relative">
                 <!-- Navigation Buttons -->

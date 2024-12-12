@@ -3,7 +3,9 @@ body {
     background-color: hsl(0, 0%, 95%);
     color: hsl(0, 0%, 35%);
 }
-
+*{
+    font-family: 'Poppins',serif; font-weight:500; font-style: normal;
+  }
 .card-container {
     padding: 3rem 1.5rem;
 }

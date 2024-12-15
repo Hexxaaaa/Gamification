@@ -206,3 +206,38 @@ visibility: hidden;
   align-items: center;
   justify-content: center;
 }
+
+.input-wrapper.error input {
+    border-color: #f44336;
+}
+
+.error-text {
+    color: #f44336;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.alert {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.alert-danger {
+    background-color: #ffe6e6;
+    border: 1px solid #ffb3b3;
+    color: #cc0000;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-wrapper .error-text {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+}

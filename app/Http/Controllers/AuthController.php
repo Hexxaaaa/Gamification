@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
-use Spatie\Activitylog\Models\Activity;
-use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
+use Spatie\Activitylog\Models\Activity;
 
 class AuthController extends Controller
 {
@@ -39,7 +39,7 @@ class AuthController extends Controller
             'age' => 'nullable|integer',
             'location' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:15',
-            
+
         ]);
 
         // Create a new user instance
@@ -65,7 +65,7 @@ class AuthController extends Controller
 
         // Redirect to the user dashboard with a success message
         return redirect()->route('user.dashboard')
-                         ->with('success', 'Registrasi berhasil. Selamat datang!');
+            ->with('success', 'Registrasi berhasil. Selamat datang!');
     }
 
     /**
@@ -86,63 +86,54 @@ class AuthController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+
     public function login(Request $request)
-{
-    // Validate the incoming request data
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required|string',
-    ]);
-
-    // Attempt to authenticate the user
-    if (!Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
-        // Log failed login attempt
-        activity()
-            ->withProperties(['email' => $request->email])
-            ->log('Failed Login Attempt');
-
-        // Throw validation exception with error message
-        throw ValidationException::withMessages([
-            'email' => ['Email atau kata sandi salah.'],
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
         ]);
-    }
-
-    // Retrieve the authenticated user
-    $user = Auth::user();
-
-    // Check if the user's account is active
-    if (!$user->active) {
-        // Log inactive user login attempt
+    
+        // Attempt to authenticate the user
+        if (!Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
+            // Log failed login attempt
+            activity()
+                ->withProperties(['email' => $request->email])
+                ->log('Failed Login Attempt');
+    
+            return back()
+                ->withInput($request->only('email'))
+                ->with('error', true);
+        }
+    
+        $user = Auth::user();
+    
+        // Check if account is active
+        if (!$user->active) {
+            Auth::logout();
+            return back()
+                ->withInput($request->only('email'))
+                ->with('error', true);
+        }
+    
+        // Regenerate the session to prevent session fixation
+        $request->session()->regenerate();
+    
+        // Log successful login
         activity()
             ->causedBy($user)
-            ->log('Inactive User Login Attempt');
-
-        // Log the user out
-        Auth::logout();
-
-        // Redirect back with an error message
-        return redirect()->back()
-                         ->withErrors(['email' => 'Akun Anda dinonaktifkan.'])
-                         ->withInput($request->only('email'));
+            ->log('User Logged In');
+    
+        // Redirect based on user type
+        if ($user->is_admin) {
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Login berhasil. Selamat datang kembali!');
+        }
+    
+        return redirect()->route('user.dashboard')
+            ->with('success', 'Login berhasil. Selamat datang kembali!');
     }
-
-    // Regenerate the session to prevent session fixation
-    $request->session()->regenerate();
-
-    // Log successful login
-    activity()
-        ->causedBy($user)
-        ->log('User Logged In');
-
-    // Redirect based on user type
-    if ($user->is_admin) {
-        return redirect()->route('admin.dashboard')
-                        ->with('success', 'Login berhasil. Selamat datang kembali!');
-    }
-
-    return redirect()->route('user.dashboard')
-                    ->with('success', 'Login berhasil. Selamat datang kembali!');
-}
 
     /**
      * Handle the logout action.
@@ -171,10 +162,10 @@ class AuthController extends Controller
 
         // Redirect to the login page with a success message
         return redirect()->route('login')
-                         ->with('success', 'Logout berhasil.');
+            ->with('success', 'Logout berhasil.');
     }
 
-      /**
+    /**
      * Redirect the user to the social provider's authentication page.
      *
      * @param  string  $provider

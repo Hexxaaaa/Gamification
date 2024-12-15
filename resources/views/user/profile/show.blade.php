@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
         rel="stylesheet">
-        <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
@@ -61,19 +61,29 @@
                 <div class="card mt-3">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-auto">
-                                @if ($user->profile_image)
-                                    <img src="{{ asset('storage/' . $user->profile_image) }}"
-                                        alt="{{ $user->name }}" class="rounded-circle" style="width: 100px;">
-                                @else
-                                    <img src="{{ url('gallery/userfoto.png') }}" alt="Default Profile"
-                                        class="rounded-circle" style="width: 100px;">
-                                @endif
-                            </div>
                             <div class="col">
                                 <form id="profileForm" action="{{ route('user.profile.update') }}" method="POST">
                                     @csrf
                                     @method('PUT')
+                                    <div class="position-relative">
+                                        @if ($user->profile_image)
+                                            <img src="{{ asset('storage/' . $user->profile_image) }}"
+                                                alt="{{ $user->name }}" class="profile-preview rounded-circle"
+                                                style="width: 100px; height: 100px; object-fit: cover;">
+                                        @else
+                                            <img src="{{ url('gallery/userfoto.png') }}" alt="Default Profile"
+                                                class="profile-preview rounded-circle"
+                                                style="width: 100px; height: 100px; object-fit: cover;">
+                                        @endif
+
+                                        <div class="image-upload-overlay d-none">
+                                            <label for="profile_image" class="btn btn-sm btn-light rounded-circle">
+                                                <i class="fas fa-camera"></i>
+                                            </label>
+                                        </div>
+                                        <input type="file" class="d-none" id="profile_image" name="profile_image"
+                                            accept="image/*" disabled>
+                                    </div>
                                     <div class="mb-3">
                                         <label for="fullname" class="form-label">Full Name</label>
                                         <input type="text" class="form-control" id="fullname" name="name"
@@ -103,7 +113,7 @@
                                         <input type="text" class="form-control" id="country" name="location"
                                             value="{{ $user->location ?? '' }}" disabled>
                                     </div>
-                                    
+
                                     <button type="button" id="editBtn" class="btn btn-primary">Edit</button>
                                     <button type="submit" id="saveBtn" class="btn btn-success d-none">Save
                                         Changes</button>
@@ -185,11 +195,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('profileForm');
-            const inputs = form.querySelectorAll('input, select');
+            const inputs = form.querySelectorAll('input:not([type="file"]), select');
             const editBtn = document.getElementById('editBtn');
             const saveBtn = document.getElementById('saveBtn');
             const cancelBtn = document.getElementById('cancelBtn');
+            const fileInput = document.getElementById('profile_image');
+            const imageOverlay = document.querySelector('.image-upload-overlay');
+            const previewImage = document.querySelector('.profile-preview');
             const originalValues = {};
+
+            // Make sure we have all required elements before proceeding
+            if (!form || !editBtn || !saveBtn || !cancelBtn || !fileInput || !imageOverlay || !previewImage) {
+                console.error('Required elements not found');
+                return;
+            }
+
+            // Store original image src if it exists
+            let originalImage = previewImage ? previewImage.src : '';
 
             // Store original values
             inputs.forEach(input => {
@@ -199,6 +221,8 @@
             // Edit button handler
             editBtn.addEventListener('click', function() {
                 inputs.forEach(input => input.disabled = false);
+                fileInput.disabled = false;
+                imageOverlay.classList.remove('d-none');
                 editBtn.classList.add('d-none');
                 saveBtn.classList.remove('d-none');
                 cancelBtn.classList.remove('d-none');
@@ -210,20 +234,39 @@
                     input.value = originalValues[input.name];
                     input.disabled = true;
                 });
+                fileInput.disabled = true;
+                imageOverlay.classList.add('d-none');
+                if (previewImage && originalImage) {
+                    previewImage.src = originalImage;
+                }
                 editBtn.classList.remove('d-none');
                 saveBtn.classList.add('d-none');
                 cancelBtn.classList.add('d-none');
+            });
+
+            // Handle image preview
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0] && previewImage) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
             });
 
             // Form submission handler
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
+                const formData = new FormData(form);
+
                 fetch(form.action, {
                         method: 'POST',
-                        body: new FormData(form),
+                        body: formData,
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     })
                     .then(response => response.json())
@@ -234,20 +277,38 @@
                                 originalValues[input.name] = input.value;
                                 input.disabled = true;
                             });
-
+                            fileInput.disabled = true;
+                            imageOverlay.classList.add('d-none');
+                            if (previewImage) {
+                                originalImage = previewImage.src;
+                            }
                             editBtn.classList.remove('d-none');
                             saveBtn.classList.add('d-none');
                             cancelBtn.classList.add('d-none');
 
                             // Show success message
-                            alert('Profile updated successfully!');
-                        } else {
-                            alert('Error updating profile');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Profile updated successfully',
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Error updating profile');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Error updating profile',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
                     });
             });
         });

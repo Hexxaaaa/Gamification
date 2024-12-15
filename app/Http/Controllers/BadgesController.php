@@ -99,12 +99,13 @@ class BadgesController extends Controller
         $user = Auth::user();
         $badge = Badge::findOrFail($id);
 
-        \Log::info('Claiming badge', [
+        // Log attempt
+        activity()->withProperties([
             'user_id' => $user->id,
             'badge_id' => $badge->id,
             'user_points' => $user->total_points,
             'badge_points' => $badge->points_required,
-        ]);
+        ])->log('User attempted to claim a badge');
 
         // Check if user already has this badge
         $userBadge = $user->userBadges()->where('badge_id', $id)->first();
@@ -139,7 +140,9 @@ class BadgesController extends Controller
                 ])
                 ->log('Badge Claimed');
 
-            return redirect()->back()->with('success', 'Badge claimed successfully!');
+            return redirect()->back()
+                ->with('success', 'Badge claimed successfully!')
+                ->with('badge_achieved', $badge);
         }
 
         return redirect()->back()->with('error', 'You do not have enough points to claim this badge.');
@@ -149,12 +152,20 @@ class BadgesController extends Controller
     {
         $user = auth()->user();
 
+        // Get all badges and update user_badges table
         $badges = Badge::orderBy('level', 'asc')->get()->map(function ($badge) use ($user) {
-            // Check if user has claimed this badge
-            $userBadge = $user->userBadges()->where('badge_id', $badge->id)->first();
-            if ($userBadge) {
-                $status = $userBadge->status;
+            // Get or create user badge record
+            $userBadge = $user->userBadges()->firstOrCreate(
+                ['badge_id' => $badge->id],
+                ['status' => 'locked']
+            );
+
+            // Update status based on points
+            if ($userBadge->status === 'collected') {
+                $status = 'collected';
             } elseif ($user->total_points >= $badge->points_required) {
+                // Update status to available if enough points
+                $userBadge->update(['status' => 'available']);
                 $status = 'available';
             } else {
                 $status = 'locked';

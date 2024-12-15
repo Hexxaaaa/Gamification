@@ -36,7 +36,8 @@
                         <div>
                             <h5 class="text-white">{{ $user->name ?? 'Anon User' }}</h5>
                             <p class="mb-1 text-white">
-                                @if ($currentBadge) <!-- Changed from isset($badge) -->
+                                @if ($currentBadge)
+                                    <!-- Changed from isset($badge) -->
                                     🎉 Your Current Level:
                                     <span class="text-decoration-none text-primary">
                                         Level {{ $currentBadge->level }} - {{ $currentBadge->name }}
@@ -49,9 +50,8 @@
                                     @endif
                                     <div class="progress mt-2" style="height: 6px; width: 200px;">
                                         <div class="progress-bar bg-primary" role="progressbar"
-                                            style="width: {{ $currentBadge && $currentBadge->points_required > 0 ? ($user->total_points / $currentBadge->points_required * 100) : 0 }}%"
-                                            aria-valuenow="{{ $user->total_points }}" 
-                                            aria-valuemin="0"
+                                            style="width: {{ $currentBadge && $currentBadge->points_required > 0 ? ($user->total_points / $currentBadge->points_required) * 100 : 0 }}%"
+                                            aria-valuenow="{{ $user->total_points }}" aria-valuemin="0"
                                             aria-valuemax="{{ $currentBadge ? $currentBadge->points_required : 0 }}">
                                         </div>
                                     </div>
@@ -64,7 +64,8 @@
                                         <ul class="list-unstyled">
                                             @foreach ($user->badges()->wherePivot('status', 'collected')->orderBy('level', 'asc')->get() as $badge)
                                                 <li>
-                                                    <span class="badge bg-success">{{ $badge->name }} (Level {{ $badge->level }})</span>
+                                                    <span class="badge bg-success">{{ $badge->name }} (Level
+                                                        {{ $badge->level }})</span>
                                                 </li>
                                             @endforeach
                                         </ul>
@@ -98,49 +99,6 @@
                 </div>
             </div>
         </div>
-        <!-- Daily Rewards Section -->
-        <div class="daily-rewards mt-5" style="background-color: #E5EDFF">
-            <h3
-                style="font-family: 'Poppins',sans-serif, font-weight: 500; font-style: normal; font-size: 65px; color: #007DFC;">
-                Daily Rewards
-            </h3>
-            <p style="font-family: 'Poppins',sans-serif, font-weight: 100; font-style: normal;">
-                Watch Videos Daily, Complete Missions, and Earn Rewards!
-            </p>
-            <p>Collect up to <strong><img src="{{ asset('gallery/kado.png') }}" style="width: 22px;">
-                    <span id="next-reward">350</span> points</strong>
-            </p>
-            <button class="btn btn-primary" id="checkInButton" style="border-radius: 200px">
-                Check-in
-            </button>
-            <div id="check-in-streak" class="mt-2"></div>
-        </div>
-
-        <!-- Progress Section -->
-        <div class="progress-container" id="progressContainer">
-            @for ($day = 1; $day <= 7; $day++)
-                @if ($day > 1)
-                    <div class="line {{ $day <= ($currentDay ?? 0) ? 'complete' : '' }}"
-                        data-day="{{ $day }}"></div>
-                @endif
-                <div class="progress-step {{ $day <= ($currentDay ?? 0) ? 'completed' : '' }} {{ $day === ($currentDay ?? 0) ? 'current' : '' }}"
-                    data-day="{{ $day }}">
-                    <div class="progress-circle">
-                        @if ($day <= ($currentDay ?? 0))
-                            <img src="{{ asset('gallery/verifiedbiru.png') }}" alt="Completed"
-                                class="status-icon complete">
-                        @else
-                            <img src="{{ asset('gallery/verifiedabu.png') }}" alt="Waiting"
-                                class="status-icon incomplete">
-                        @endif
-                    </div>
-                    <div class="step-label">{{ $day <= ($currentDay ?? 0) ? 'Completed' : 'Waiting' }}</div>
-                    <div class="step-points">Day-{{ $day }} {{ 50 * $day }} points</div>
-                </div>
-            @endfor
-        </div>
-
-
 
         <div class="voucher-section">
             <div class="container">
@@ -252,6 +210,44 @@
 
         <script src="{{ asset('js/rewards.js') }}"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Success notification for voucher redemption
+                @if (session('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: "{{ session('success') }}",
+                        showConfirmButton: true,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#28a745',
+                        html: `
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <img src="{{ asset('gallery/coindaily.png') }}" alt="Coin" style="width: 60px;">
+                            </div>
+                            <h4 class="text-success mb-2">Voucher Redeemed!</h4>
+                            <p class="mb-0">{{ session('success') }}</p>
+                        </div>
+                    `
+                    });
+                @endif
+
+                // Error notification for failed redemption
+                @if (session('error'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: "{{ session('error') }}",
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
+                @endif
+            });
+        </script>
+
 </body>
 
 </html>

@@ -14,7 +14,7 @@
 
 <body>
 
-   @include('layouts.header')
+    @include('layouts.header')
 
     <main class="py-5">
         <div class="container">
@@ -34,8 +34,19 @@
             </div>
 
             <!-- Progress bar -->
-            <div class="progress mt-3" style="height: 0.5rem;">
-                <div class="progress-bar" role="progressbar" style="width: 0%" id="video-progress"></div>
+            <div class="progress-section mt-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="progress-text text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Video Progress: Watch the video to unlock rewards
+                    </span>
+                    <span class="progress-percentage text-muted" id="progress-percentage">0%</span>
+                </div>
+                <div class="progress" style="height: 0.5rem;">
+                    <div class="progress-bar" role="progressbar" style="width: 0%" id="video-progress" aria-valuenow="0"
+                        aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
             </div>
 
             <div class="mt-4 d-flex justify-content-between align-items-center">
@@ -156,7 +167,7 @@
 
     <script>
         let player;
-        let progressBar;
+        let progressBar = document.getElementById('video-progress');
         let progressInterval;
 
         // YouTube player initialization
@@ -179,6 +190,45 @@
                     }
                 });
             }
+        }
+
+        // HTML5 video handling
+        const video = document.getElementById('task-video');
+        if (video) {
+            // Initialize progress bar immediately for HTML5 video
+            video.addEventListener('loadedmetadata', () => {
+                if (!progressBar) {
+                    progressBar = document.getElementById('video-progress');
+                }
+            });
+
+            video.addEventListener('play', () => {
+                // Update task status to 'started' when video starts playing
+                fetch("{{ route('user.tasks.start', $userTask->id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+            });
+
+            video.addEventListener('timeupdate', () => {
+                if (progressBar) {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    progressBar.style.width = `${progress}%`;
+
+                    // Update percentage text
+                    document.getElementById('progress-percentage').textContent =
+                        `${Math.round(progress)}%`;
+
+                    if (progress >= 95) {
+                        showCompleteButton();
+                    }
+                }
+            });
+
+            video.addEventListener('ended', showCompleteButton);
         }
 
         // YouTube helper functions
@@ -220,11 +270,17 @@
                         const currentTime = player.getCurrentTime();
                         const progress = (currentTime / duration) * 100;
 
+                        // Update progress bar
                         progressBar.style.width = `${progress}%`;
+
+                        // Update percentage text
+                        document.getElementById('progress-percentage').textContent =
+                            `${Math.round(progress)}%`;
 
                         if (progress >= 95) {
                             clearInterval(progressInterval);
                             progressBar.style.width = '100%';
+                            document.getElementById('progress-percentage').textContent = '100%';
                             showCompleteButton();
                         }
                     }
@@ -232,30 +288,8 @@
             }
         }
 
-        // HTML5 video handling
-        const video = document.getElementById('task-video');
-        if (video) {
-            video.addEventListener('play', () => {
-                // Update task status to 'started' when video starts playing
-                fetch("{{ route('user.tasks.start', $userTask->id) }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                });
-            });
-            video.addEventListener('timeupdate', () => {
-                const progress = (video.currentTime / video.duration) * 100;
-                progressBar.style.width = `${progress}%`;
 
-                if (progress >= 95) {
-                    showCompleteButton();
-                }
-            });
 
-            video.addEventListener('ended', showCompleteButton);
-        }
 
         // Task completion handling
         function showCompleteButton() {
@@ -293,7 +327,9 @@
                 `,
                             showConfirmButton: true,
                             confirmButtonText: 'Claim Rewards!',
-                            confirmButtonClass: 'btn btn-success rounded-pill px-4',
+                            customClass: {
+                                confirmButton: 'btn btn-success rounded-pill px-4'
+                            },
                             allowOutsideClick: false
                         }).then((result) => {
                             if (result.isConfirmed) {
@@ -306,9 +342,12 @@
 
         $(document).ready(function() {
             // General interaction handler for like/share/comment buttons
-            $('.interact-btn').click(function() {
+            $('.interact-btn').on('click', function(e) {
+                e.preventDefault(); // Prevent default button behavior
                 const button = $(this);
                 const type = button.data('type');
+
+                console.log('Button clicked:', type); // Add debug logging
 
                 // If it's a comment, let the comment modal handle it
                 if (type === 'comment') {
@@ -386,9 +425,10 @@
                     },
                     success: function(response) {
                         if (response.success) {
-
                             // Mark as commented
                             commentBtn.addClass('active');
+                            commentBtn.addClass('btn-primary').removeClass(
+                                'btn-outline-primary');
 
                             // Update points
                             updatePoints(commentBtn.data('points'));
@@ -437,25 +477,51 @@
                     return;
                 }
 
+                // Disable button while processing
+                button.prop('disabled', true);
+
+
                 $.ajax({
-                    url: "{{ route('user.tasks.interaction', ['task' => ':taskId']) }}".replace(':taskId',
-                        taskId),
+                    url: `/user/tasks/${taskId}/interaction`,
                     method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
                     data: {
-                        _token: '{{ csrf_token() }}',
-                        type: type
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        type: type,
+                        comment: null
                     },
                     success: function(response) {
                         if (response.success) {
+                            // Add active class and styling
                             button.addClass('active');
+                            button.addClass('btn-primary').removeClass('btn-outline-primary');
+
+                            // Update points
                             updatePoints(points);
+
+                            // Show success notification
                             showNotification('success', 'Points Earned!',
                                 `+${points} points for ${type}ing this task!`);
+
+                            // Keep button disabled
                             button.prop('disabled', true);
+                        } else {
+                            button.prop('disabled', false);
+                            showNotification('error', 'Error', response.message ||
+                                'Something went wrong!');
                         }
                     },
-                    error: function() {
-                        showNotification('error', 'Oops...', 'Something went wrong!');
+                    error: function(xhr) {
+                        button.prop('disabled', false);
+
+                        let errorMessage = xhr.responseJSON?.message || 'Something went wrong!';
+                        showNotification('error', 'Error', errorMessage);
+
+                        if (xhr.status === 419) {
+                            window.location.reload();
+                        }
                     }
                 });
             }
@@ -474,9 +540,13 @@
 
 
             function updatePoints(points) {
-                const pointsElement = $('.points');
-                const currentPoints = parseInt(pointsElement.text().replace(/[^0-9]/g, ''));
-                pointsElement.text(`${(currentPoints + points).toLocaleString()} PTS`);
+                // Update points in header
+                const pointsElement = $('.badge.bg-primary');
+                if (pointsElement.length) {
+                    const currentPoints = parseInt(pointsElement.text().replace(/[^0-9]/g, ''));
+                    const newPoints = currentPoints + points;
+                    pointsElement.text(`${newPoints.toLocaleString()} Pts`);
+                }
             }
         });
     </script>

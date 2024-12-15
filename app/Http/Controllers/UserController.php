@@ -11,7 +11,6 @@ use App\Models\UserTask;
 use App\Models\UserVoucher;
 use App\Models\Voucher;
 use App\Notifications\BadgeAchieved;
-use App\Notifications\PointsEarned;
 use App\Notifications\TaskCompleted;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -54,11 +53,11 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $totalTasks = Task::count();
-$userTasksCount = $user->userTasks()->count();
+        $userTasksCount = $user->userTasks()->count();
 // Add null check and fallback to 0 if no tasks exist
-$engagement = $totalTasks > 0 
-    ? round(($userTasksCount / $totalTasks) * 100) 
-    : 0;
+        $engagement = $totalTasks > 0
+        ? round(($userTasksCount / $totalTasks) * 100)
+        : 0;
 
         // Get real metrics from interactions
         $interactions = $user->interactions()
@@ -307,6 +306,8 @@ $engagement = $totalTasks > 0
         $user->total_points += $task->points; // Points for watching the video
         $user->save();
 
+        $this->updateBadgeStatuses($user);
+
         $user->notify(new TaskCompleted($task));
 
         // Log task completion
@@ -431,96 +432,85 @@ $engagement = $totalTasks > 0
     public function logInteraction(Request $request, Task $task)
     {
         try {
-            $request->validate([
-                'type' => 'required|in:like,comment,share',
-                'comment' => 'required_if:type,comment|string|max:500',
+            $validated = $request->validate([
+                'type' => 'required|string|in:like,comment,share',
+                'comment' => 'required_if:type,comment|string|max:500|nullable',
             ]);
 
-            // Check if interaction already exists
-            if (Auth::user()->interactions()->where('task_id', $task->id)->where('type', $request->type)->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Already interacted with this task',
-                ], 400);
-            }
-
-            $interaction = Interaction::create([
-                'user_id' => Auth::id(),
-                'task_id' => $task->id,
-                'type' => $request->type,
-                'content' => $request->comment ?? null,
-            ]);
-
-            // Assign points based on interaction type
-            switch ($request->type) {
-                case 'like':
-                    $points = 10;
-                    break;
-                case 'comment':
-                    $points = 20;
-                    break;
-                case 'share':
-                    $points = 50;
-                    break;
-                default:
-                    $points = 0;
-            }
+            DB::beginTransaction();
 
             $user = Auth::user();
-            if ($points > 0) {
-                $user->total_points += $points;
-                $user->save();
 
-                // Notify user of points earned
-                $user->notify(new PointsEarned($points, $request->type));
+            // Check for existing interaction
+            $existingInteraction = $user->interactions()
+                ->where('task_id', $task->id)
+                ->where('type', $validated['type'])
+                ->first();
 
-                // Log interaction and points earned
-                activity()
-                    ->causedBy($user)
-                    ->performedOn($task)
-                    ->withProperties([
-                        'interaction_type' => $request->type,
-                        'points_earned' => $points,
-                        'total_points' => $user->total_points,
-                    ])
-                    ->log('Interaction Logged and Points Earned');
+            if ($existingInteraction) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "You have already {$validated['type']}d this task",
+                ], 409);
             }
 
-            // Check and award badges
-            $newBadges = [];
-            $badges = Badge::where('points_required', '<=', $user->total_points)->get();
-            foreach ($badges as $badge) {
-                if (!$user->badges()->where('badge_id', $badge->id)->exists()) {
-                    $user->badges()->attach($badge->id);
-                    $user->notify(new BadgeAchieved($badge));
-                    $newBadges[] = $badge;
+            // Create interaction
+            $interaction = Interaction::create([
+                'user_id' => $user->id,
+                'task_id' => $task->id,
+                'type' => $validated['type'],
+                'content' => $validated['type'] === 'comment' ? $validated['comment'] : null,
+            ]);
 
-                    activity()
-                        ->causedBy($user)
-                        ->performedOn($badge)
-                        ->withProperties(['badge_id' => $badge->id])
-                        ->log('Badge Achieved');
-                }
-            }
+            // Award points
+            $pointsMap = [
+                'like' => 10,
+                'comment' => 20,
+                'share' => 50,
+            ];
+
+            $points = $pointsMap[$validated['type']] ?? 0;
+            $user->increment('total_points', $points);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Interaction recorded successfully',
-                'data' => [
-                    'interaction' => $interaction,
-                    'points_earned' => $points,
-                    'total_points' => $user->total_points,
-                    'new_badges' => $newBadges,
-                ],
-            ], 200);
+                'message' => ucfirst($validated['type']) . ' recorded successfully',
+                'points' => $points,
+            ]);
 
         } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Interaction Error: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to record interaction',
-                'error' => $e->getMessage(),
+                'message' => 'An error occurred while recording your interaction',
             ], 500);
         }
+    }
+    // Helper method for badge processing
+    private function processNewBadges(User $user): array
+    {
+        $newBadges = [];
+        $badges = Badge::where('points_required', '<=', $user->total_points)
+            ->whereNotIn('id', $user->badges()->pluck('badge_id'))
+            ->get();
+
+        foreach ($badges as $badge) {
+            $user->badges()->attach($badge->id);
+            $user->notify(new BadgeAchieved($badge));
+            $newBadges[] = $badge;
+
+            activity()
+                ->causedBy($user)
+                ->performedOn($badge)
+                ->withProperties(['badge_id' => $badge->id])
+                ->log('Badge Achieved');
+        }
+
+        return $newBadges;
     }
 
     /**
@@ -640,31 +630,31 @@ $engagement = $totalTasks > 0
     {
         $user = Auth::user();
         $now = now(); // This will use the configured timezone
-    
+
         // Get user's last check-in
         $lastCheckIn = DailyCheckIn::where('user_id', $user->id)
             ->latest()
             ->first();
-    
+
         // Check if user already checked in today using the correct timezone
         if ($lastCheckIn && $lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Already checked in today'
+                'message' => 'Already checked in today',
             ], 400);
         }
-    
+
         // Calculate day count
         $dayCount = 1; // Default to day 1
-    
+
         // Only maintain streak if checked in yesterday
         if ($lastCheckIn && $lastCheckIn->last_check_in->timezone(config('app.timezone'))->isYesterday()) {
             $dayCount = min($lastCheckIn->day_count + 1, 7);
         }
-    
+
         // Calculate points (50 points × day count)
         $points = 50 * $dayCount;
-    
+
         // Create new check-in record
         DailyCheckIn::create([
             'user_id' => $user->id,
@@ -672,11 +662,11 @@ $engagement = $totalTasks > 0
             'last_check_in' => $now,
             'points_earned' => $points,
         ]);
-    
+
         // Add points to user
         $user->total_points += $points;
         $user->save();
-    
+
         // Log the check-in activity
         activity()
             ->causedBy($user)
@@ -685,7 +675,7 @@ $engagement = $totalTasks > 0
                 'points_earned' => $points,
             ])
             ->log('Daily Check-in Complete');
-    
+
         return response()->json([
             'success' => true,
             'points' => $points,
@@ -699,42 +689,42 @@ $engagement = $totalTasks > 0
  * @return \Illuminate\Http\JsonResponse
  */
 
- public function checkInStatus()
- {
-     $user = Auth::user();
-     
-     // Get last check-in using correct timezone
-     $lastCheckIn = DailyCheckIn::where('user_id', $user->id)
-         ->latest()
-         ->first();
- 
-     $canCheckIn = !$lastCheckIn || 
-         !$lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday();
- 
-     $currentDay = 0;
-     $streak = 0;
- 
-     if ($lastCheckIn) {
-         if ($lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday()) {
-             $currentDay = $lastCheckIn->day_count;
-             $streak = $currentDay;
-         } else if ($lastCheckIn->last_check_in->timezone(config('app.timezone'))->isYesterday()) {
-             $currentDay = $lastCheckIn->day_count;
-             $streak = $currentDay;
-         }
-     }
- 
-     // Calculate next reward
-     $nextDay = min($streak + 1, 7);
-     $nextReward = $nextDay * 50;
- 
-     return response()->json([
-         'can_check_in' => $canCheckIn,
-         'current_day' => $currentDay,
-         'current_streak' => $streak,
-         'next_reward' => $nextReward,
-     ]);
- }
+    public function checkInStatus()
+    {
+        $user = Auth::user();
+
+        // Get last check-in using correct timezone
+        $lastCheckIn = DailyCheckIn::where('user_id', $user->id)
+            ->latest()
+            ->first();
+
+        $canCheckIn = !$lastCheckIn ||
+        !$lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday();
+
+        $currentDay = 0;
+        $streak = 0;
+
+        if ($lastCheckIn) {
+            if ($lastCheckIn->last_check_in->timezone(config('app.timezone'))->isToday()) {
+                $currentDay = $lastCheckIn->day_count;
+                $streak = $currentDay;
+            } else if ($lastCheckIn->last_check_in->timezone(config('app.timezone'))->isYesterday()) {
+                $currentDay = $lastCheckIn->day_count;
+                $streak = $currentDay;
+            }
+        }
+
+        // Calculate next reward
+        $nextDay = min($streak + 1, 7);
+        $nextReward = $nextDay * 50;
+
+        return response()->json([
+            'can_check_in' => $canCheckIn,
+            'current_day' => $currentDay,
+            'current_streak' => $streak,
+            'next_reward' => $nextReward,
+        ]);
+    }
 
     /**
      * Check if a task is available for the user.
@@ -774,6 +764,33 @@ $engagement = $totalTasks > 0
         ]);
     }
 
-    
+    protected function updateBadgeStatuses($user)
+    {
+        // Initialize newBadge variable
+        $newBadge = null;
+        // Get all badges where user has enough points but hasn't collected yet
+        $eligibleBadges = Badge::where('points_required', '<=', $user->total_points)
+            ->whereDoesntHave('userBadges', function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('status', 'collected');
+            })
+            ->get();
 
+        foreach ($eligibleBadges as $badge) {
+            // Get or create user badge record
+            $userBadge = $user->userBadges()->firstOrCreate(
+                ['badge_id' => $badge->id],
+                ['status' => 'locked']
+            );
+
+            // Update to available if not already collected
+            if ($userBadge->status !== 'collected') {
+                $userBadge->update(['status' => 'available']);
+                $newBadge = $badge;
+            }
+        }
+        if ($newBadge) {
+            session()->flash('badge_achieved', $newBadge);
+        }
+    }
 }

@@ -164,17 +164,7 @@
             @endforeach
         </div>
     </div>
-    {{-- <div class="container py-5">
-        <div class="row image-row">
-            @foreach ($bottomMovies as $movie)
-            <div class="col-md-2 mb-4">
-                <div class="image-container">
-                    <img src="{{ $movie->thumbnail_url ?? asset('gallery/list2gambar1.png') }}" alt="{{ $movie->description }}">
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div> --}}
+
     <div class="container mt-5" style="background-color: #d0e7f9; padding:100px; border-radius:30px;">
         <div class="text-center">
             <h5 class="section-title">Earn Special Points every time you finish watching videos!</h5>
@@ -243,9 +233,7 @@
                             <div>
                                 <h4>{{ $userTask->task->description }}</h4>
                                 <p class="mb-2">
-                                    <span class="badge bg-warning">
-                                        {{ number_format($userTask->task->points) }} points
-                                    </span>
+
                                     <span class="badge bg-info ms-2">
                                         {{ $userTask->status === 'started' ? 'In Progress' : 'Pending' }}
                                     </span>

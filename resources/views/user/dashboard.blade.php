@@ -4,11 +4,15 @@
 <head>
     <title>Beranda</title>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/rewards.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4/bootstrap-4.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
@@ -37,13 +41,16 @@
                 <div class="col-md-6 d-flex justify-content-center">
                     <div class="card-custom text-center">
                         <div class="position-relative d-inline-block">
-                            <a href="{{ route('user.profile.show') }}" class="profile-link" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Click to view profile">
+                            <a href="{{ route('user.profile.show') }}" class="profile-link" data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="Click to view profile">
                                 @if (isset($user) && $user->profile_image)
                                     <img src="{{ asset('storage/' . $user->profile_image) }}" alt="{{ $user->name }}"
-                                        class="rounded-circle profile-image" style="width: 70px; height: 70px; object-fit: cover;">
+                                        class="rounded-circle profile-image"
+                                        style="width: 70px; height: 70px; object-fit: cover;">
                                 @else
                                     <img src="{{ asset('gallery/userfoto.png') }}" alt="Default Profile"
-                                        class="rounded-circle profile-image" style="width: 70px; height: 70px; object-fit: cover;">
+                                        class="rounded-circle profile-image"
+                                        style="width: 70px; height: 70px; object-fit: cover;">
                                 @endif
                                 <div class="position-absolute top-0 start-0 w-100 h-100 rounded-circle overlay"></div>
                             </a>
@@ -133,7 +140,7 @@
         </div>
         <div class="container py-5">
             <h1 class=" text-black mb-4">Featured Video</h1>
-            
+
             <div class="carousel-container position-relative">
                 <!-- Navigation Buttons -->
                 <button class="carousel-nav prev" aria-label="Previous">
@@ -142,91 +149,92 @@
                 <button class="carousel-nav next" aria-label="Next">
                     <span class="carousel-arrow">›</span>
                 </button>
-    
+
                 <!-- Movie Cards Container -->
+                
                 <div class="movie-carousel">
-                    <!-- Movie Card 1 -->
-                    <div class="movie-card">
-                        <img src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=800&q=80" alt="The Haunting" class="movie-image">
-                        <div class="movie-overlay">
-                            <div class="movie-content">
-                                <h3 class="movie-title">The Haunting</h3>
-                                <div class="movie-info">
-                                    <span>1:45:00</span>
-                                    <span class="separator">•</span>
-                                    <span>HORROR, ACTION</span>
-                                </div>
-                                <div class="movie-buttons">
-                                    <button class="btn btn-light btn-sm">WATCH</button>
-                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Movie Card 2 -->
-                    <div class="movie-card">
-                        <img src="https://images.unsplash.com/photo-1494236536165-dab4d859818b?auto=format&fit=crop&w=800&q=80" alt="Dark Woods" class="movie-image">
-                        <div class="movie-overlay">
-                            <div class="movie-content">
-                                <h3 class="movie-title">Dark Woods</h3>
-                                <div class="movie-info">
-                                    <span>2:15:00</span>
-                                    <span class="separator">•</span>
-                                    <span>HORROR, THRILLER</span>
-                                </div>
-                                <div class="movie-buttons">
-                                    <button class="btn btn-light btn-sm">WATCH</button>
-                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
+                    @foreach ($featuredTasks as $task)
+                        <div class="movie-card">
+                            <img src="{{ $task->thumbnail_url ?? asset('gallery/default.jpeg') }}"
+                                alt="{{ $task->description }}" class="movie-image">
+                            <div class="movie-overlay">
+                                <div class="movie-content">
+                                    <h3 class="movie-title">{{ Str::limit($task->description, 50) }}</h3>
+                                    <div class="movie-info">
+                                        @if ($task->video_duration)
+                                            <span>{{ gmdate('H:i:s', $task->video_duration) }}</span>
+                                            <span class="separator">•</span>
+                                        @endif
+                                        <span>{{ number_format($task->points) }} Points</span>
+                                    </div>
+                                    <div class="movie-buttons">
+                                        <button onclick="startTaskWithAnimation({{ $task->id }})"
+                                            class="btn btn-light btn-sm">
+                                            WATCH
+                                        </button>
+                                        @if (!$task->userTasks->where('user_id', Auth::id())->first())
+                                            <button onclick="startTask({{ $task->id }})"
+                                                class="btn btn-outline-light btn-sm">
+                                                ADD LIST
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-    
-                    <!-- Movie Card 3 -->
-                    <div class="movie-card">
-                        <img src="https://images.unsplash.com/photo-1515634928627-2a4e0dae3ddf?auto=format&fit=crop&w=800&q=80" alt="Night City" class="movie-image">
-                        <div class="movie-overlay">
-                            <div class="movie-content">
-                                <h3 class="movie-title">Night City</h3>
-                                <div class="movie-info">
-                                    <span>1:55:00</span>
-                                    <span class="separator">•</span>
-                                    <span>ACTION, DRAMA</span>
-                                </div>
-                                <div class="movie-buttons">
-                                    <button class="btn btn-light btn-sm">WATCH</button>
-                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-    
-                    <!-- Movie Card 4 -->
-                    <div class="movie-card">
-                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=800&q=80" alt="The Last Stand" class="movie-image">
-                        <div class="movie-overlay">
-                            <div class="movie-content">
-                                <h3 class="movie-title">The Last Stand</h3>
-                                <div class="movie-info">
-                                    <span>2:30:00</span>
-                                    <span class="separator">•</span>
-                                    <span>ACTION, FANTASY</span>
-                                </div>
-                                <div class="movie-buttons">
-                                    <button class="btn btn-light btn-sm">WATCH</button>
-                                    <button class="btn btn-outline-light btn-sm">ADD LIST</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
+        
 
+          <!-- Daily Rewards Section -->
+          <div class="daily-rewards mt-5" style="background-color: #E5EDFF">
+            <h3
+                style="font-family: 'Poppins',sans-serif, font-weight: 500; font-style: normal; font-size: 65px; color: #007DFC;">
+                Daily Rewards
+            </h3>
+            <p style="font-family: 'Poppins',sans-serif, font-weight: 100; font-style: normal;">
+                Watch Videos Daily, Complete Missions, and Earn Rewards!
+            </p>
+            <p>Collect up to <strong><img src="{{ asset('gallery/kado.png') }}" style="width: 22px;">
+                    <span id="next-reward">350</span> points</strong>
+            </p>
+            <button class="btn btn-primary" id="checkInButton" style="border-radius: 200px">
+                Check-in
+            </button>
+            <div id="check-in-streak" class="mt-2"></div>
+        </div>
 
+        <!-- Progress Section -->
+        <div class="progress-container" id="progressContainer">
+            @for ($day = 1; $day <= 7; $day++)
+                @if ($day > 1)
+                    <div class="line {{ $day <= ($currentDay ?? 0) ? 'complete' : '' }}"
+                        data-day="{{ $day }}"></div>
+                @endif
+                <div class="progress-step {{ $day <= ($currentDay ?? 0) ? 'completed' : '' }} {{ $day === ($currentDay ?? 0) ? 'current' : '' }}"
+                    data-day="{{ $day }}">
+                    <div class="progress-circle">
+                        @if ($day <= ($currentDay ?? 0))
+                            <img src="{{ asset('gallery/verifiedbiru.png') }}" alt="Completed"
+                                class="status-icon complete">
+                        @else
+                            <img src="{{ asset('gallery/verifiedabu.png') }}" alt="Waiting"
+                                class="status-icon incomplete">
+                        @endif
+                    </div>
+                    <div class="step-label">{{ $day <= ($currentDay ?? 0) ? 'Completed' : 'Waiting' }}</div>
+                    <div class="step-points">Day-{{ $day }} {{ 50 * $day }} points</div>
+                </div>
+            @endfor
+        </div>
 
         <br><br><br>
+
+
+
+
         <div class="container text-center">
             <h4 class="text-primary mt-4">OUR MISSION</h4>
             <h1 class="fw-bold mt-2">Gamification platform highlights</h1>
@@ -280,6 +288,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
     </script>
+    <script src="{{ asset('js/rewards.js') }}"></script>
     <script src="{{ asset('js/dashboard.js') }}"></script>
 </body>
 

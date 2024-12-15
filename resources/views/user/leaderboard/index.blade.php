@@ -13,6 +13,7 @@
         rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="{{ asset('css/leaderboard.css') }}">
 </head>
 
@@ -197,6 +198,56 @@
     </footer>
     <script src="{{ asset('js/leaderboard.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there's a newly achieved badge in the session
+            @if (session('badge_achieved'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'New Badge Achieved! 🎉',
+                    html: `
+                        <div class="text-center">
+                            <h4 class="text-success mb-3">{{ session('badge_achieved')->name }}</h4>
+                            <p class="mb-2">Level {{ session('badge_achieved')->level }}</p>
+                            <p class="text-muted">{{ session('badge_achieved')->description }}</p>
+                            <div class="mt-3">
+                                <img src="{{ asset('gallery/coindaily.png') }}" alt="Badge Icon" style="width: 60px;">
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Awesome!',
+                    confirmButtonColor: '#28a745'
+                });
+            @endif
+
+            // Show notification when badge is claimed
+            @if (session('success') && str_contains(session('success'), 'Badge claimed'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Badge Claimed!',
+                    text: "{{ session('success') }}",
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            @endif
+
+            // Show error notifications
+            @if (session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: "{{ session('error') }}",
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            @endif
+        });
+    </script>
 </body>
 
 </html>

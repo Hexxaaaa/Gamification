@@ -29,3 +29,43 @@ body {
     background-color: #f8f9fa;
     padding: 10px 0;
   }
+
+    .progress-section {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+  }
+  
+  .progress-text {
+      font-size: 0.9rem;
+      color: #6c757d;
+  }
+  
+  .progress-percentage {
+      font-weight: 500;
+      font-size: 0.9rem;
+  }
+  
+  .progress {
+      background-color: #e9ecef;
+  }
+  
+  .progress-bar {
+      background-color: #0d6efd;
+      transition: width 0.3s ease;
+  }
+
+    .interact-btn.active {
+      pointer-events: none;
+      background-color: var(--bs-primary) !important;
+      color: white !important;
+      border-color: var(--bs-primary) !important;
+  }
+  
+  .interact-btn.active img {
+      filter: brightness(0) invert(1);
+  }
+  
+  .interact-btn.active span {
+      color: white;
+  }

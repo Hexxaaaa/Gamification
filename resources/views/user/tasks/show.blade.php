@@ -17,90 +17,95 @@
     @include('layouts.header')
 
     <main class="py-5">
-        <div class="container">
-            <div class="video-container position-relative">
-                @if ($userTask->task->video_type === 'youtube')
-                    <iframe id="youtube-player" width="100%" height="600"
-                        src="{{ $userTask->task->video_url }}?enablejsapi=1&origin={{ url('/') }}" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                @elseif($userTask->task->video_type === 'file')
-                    <video id="task-video" width="100%" height="600" controls>
-                        <source src="{{ $userTask->task->video_url }}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                @endif
+        <<div class="container">
+    <div class="video-container position-relative">
+        @if ($userTask->task->video_type === 'youtube')
+            <iframe id="youtube-player" width="100%" height="600"
+                src="{{ $userTask->task->video_url }}?enablejsapi=1&origin={{ url('/') }}&autoplay=1&controls=0"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        @elseif($userTask->task->video_type === 'file')
+            <video id="task-video" width="100%" height="600" autoplay muted>
+                <source src="{{ $userTask->task->video_url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        @endif
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-section mt-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="progress-text text-muted">
+                <i class="bi bi-info-circle"></i>
+                Video Progress: Watch the video to unlock rewards
+            </span>
+            <span class="progress-percentage text-muted" id="progress-percentage">0%</span>
+        </div>
+        <div class="progress" style="height: 0.5rem;">
+            <div class="progress-bar" role="progressbar" style="width: 0%" id="video-progress" aria-valuenow="0"
+                aria-valuemin="0" aria-valuemax="100">
             </div>
+        </div>
+    </div>
 
-            <!-- Progress bar -->
-            <div class="progress-section mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="progress-text text-muted">
-                        <i class="bi bi-info-circle"></i>
-                        Video Progress: Watch the video to unlock rewards
-                    </span>
-                    <span class="progress-percentage text-muted" id="progress-percentage">0%</span>
-                </div>
-                <div class="progress" style="height: 0.5rem;">
-                    <div class="progress-bar" role="progressbar" style="width: 0%" id="video-progress" aria-valuenow="0"
-                        aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                </div>
-            </div>
+    <div class="mt-4 d-flex justify-content-between align-items-center">
+        <form action="{{ route('user.tasks.complete', $userTask->id) }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" id="complete-task-btn" class="btn btn-success d-none">
+                Complete Task
+            </button>
+        </form>
+    </div>
+</div>
 
-            <div class="mt-4 d-flex justify-content-between align-items-center">
-                <button class="btn btn-primary">Continue Watching</button>
-                <form action="{{ route('user.tasks.complete', $userTask->id) }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" id="complete-task-btn" class="btn btn-success d-none">
-                        Complete Task
-                    </button>
-                </form>
-            </div>
 
-            <h3 class="mt-4">Experience the Fun of Progress</h3>
-            <p>{{ $userTask->task->description }}</p>
-            <div class="action-buttons d-flex gap-5">
-                <button
-                    class="btn btn-outline-primary interact-btn {{ in_array('like', $userInteractions) ? 'active' : '' }}"
-                    data-type="like" data-task="{{ $userTask->task_id }}" data-points="10">
-                    <img src="{{ url('gallery/like.png') }}" alt="iconjempol" style="width: 30px">
-                    <span class="d-block mt-1">+10 pts</span>
-                </button>
+<div class="container my-4">
+    <h3 class="mt-4">Experience the Fun of Progress</h3>
+    <p>{{ $userTask->task->description }}</p>
 
-                <button
-                    class="btn btn-outline-primary interact-btn {{ in_array('share', $userInteractions) ? 'active' : '' }}"
-                    data-type="share" data-task="{{ $userTask->task_id }}" data-points="50" data-bs-toggle="modal"
-                    data-bs-target="#shareModal">
-                    <img src="{{ url('gallery/sharetask.png') }}" alt="iconshare" style="width: 30px">
-                    <span class="d-block mt-1">+50 pts</span>
-                </button>
+    <!-- Grid layout for buttons -->
+    <div class="row gx-3 gy-3">
+        <!-- Like Button -->
+        <div class="col-12 col-sm-6 col-md-4">
+            <button
+                class="btn btn-outline-primary interact-btn w-100 {{ in_array('like', $userInteractions) ? 'active' : '' }}"
+                data-type="like" data-task="{{ $userTask->task_id }}" data-points="10">
+                <img src="{{ url('gallery/like.png') }}" alt="iconjempol" style="width: 30px">
+                <span class="d-block mt-1">+10 pts</span>
+            </button>
+        </div>
 
-                <button
-                    class="btn btn-outline-primary interact-btn {{ in_array('comment', $userInteractions) ? 'active' : '' }}"
-                    data-type="comment" data-task="{{ $userTask->task_id }}" data-points="20" data-bs-toggle="modal"
-                    data-bs-target="#commentModal">
-                    <img src="{{ url('gallery/commentask.png') }}" alt="iconkomen" style="width: 30px">
-                    <span class="d-block mt-1">+20 pts</span>
-                </button>
-            </div>
+        <!-- Share Button -->
+        <div class="col-12 col-sm-6 col-md-4">
+            <button
+                class="btn btn-outline-primary interact-btn w-100 {{ in_array('share', $userInteractions) ? 'active' : '' }}"
+                data-type="share" data-task="{{ $userTask->task_id }}" data-points="50" data-bs-toggle="modal"
+                data-bs-target="#shareModal">
+                <img src="{{ url('gallery/sharetask.png') }}" alt="iconshare" style="width: 30px">
+                <span class="d-block mt-1">+50 pts</span>
+            </button>
+        </div>
 
-            <p>Discover a platform where every action counts! Watch videos, like, comment, and share to earn points
+        <!-- Comment Button -->
+        <div class="col-12 col-sm-6 col-md-4">
+            <button
+                class="btn btn-outline-primary interact-btn w-100 {{ in_array('comment', $userInteractions) ? 'active' : '' }}"
+                data-type="comment" data-task="{{ $userTask->task_id }}" data-points="20" data-bs-toggle="modal"
+                data-bs-target="#commentModal">
+                <img src="{{ url('gallery/commentask.png') }}" alt="iconkomen" style="width: 30px">
+                <span class="d-block mt-1">+20 pts</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<br>
+            <p class=" text-center">Discover a platform where every action counts! Watch videos, like, comment, and share to earn points
                 effortlessly. Turn your daily interactions into exciting rewards and climb the leaderboard with
                 every step forward. Whether you're enjoying your favorite content or unlocking exclusive perks,
                 PointPlay makes every moment rewarding. Start now and experience progress like never before!</p>
-            <div class="row mt-5">
-                @foreach ($relatedTasks as $relatedTask)
-                    <div class="col-6 col-md-3">
-                        <iframe width="100%" height="150" src="{{ $relatedTask->video_url }}"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                @endforeach
-            </div>
         </div>
 
         <!-- Add Share Modal -->

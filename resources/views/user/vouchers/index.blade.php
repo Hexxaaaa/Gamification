@@ -202,7 +202,7 @@
                 </div>
 
                 <div class="col-lg-4 col-md-12 illustration">
-                    <img src="{{ url('gallery/logorewards.png') }}">
+                    <img src="{{ url('gallery/logorewardsvoucher.png') }}" style="width: 400px">
                 </div>
             </div>
         </div>
